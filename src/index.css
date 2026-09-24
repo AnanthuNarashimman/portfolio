@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+
+  /* Warm scale: cream #F8EBAB (200) · gold #F7D87F (300) · vermilion #D0311E (600) · crimson #BE1A1A (700) */
+  --color-accent-50: #fefbef;
+  --color-accent-100: #fcf5d6;
+  --color-accent-200: #f8ebab;
+  --color-accent-300: #f7d87f;
+  --color-accent-400: #e98a3f;
+  --color-accent-500: #dc4a28;
+  --color-accent-600: #d0311e;
+  --color-accent-700: #be1a1a;
+  --color-accent-800: #8f1414;
+  --color-accent-900: #4a0b0b;
+  --color-ink: #1c0d0a;
+  --color-muted: #6e5b52;
+
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-slow: float 9s ease-in-out infinite;
+
+  @keyframes pixel-wave {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+}
+
+@custom-variant tall (@media (min-height: 820px));
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-white font-sans text-ink antialiased;
+}
+
+::selection {
+  @apply bg-accent-200 text-accent-900;
+}
+
+/* Faint line grid that fades out toward the edges of the hero card */
+.bg-grid {
+  background-image:
+    linear-gradient(rgb(248 235 171 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(248 235 171 / 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, #000 20%, transparent 80%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Arch: semicircle top, softly rounded bottom (rounded-t-full would squash the bottom radii) */
+.arch {
+  border-radius: 50% 50% 2.5rem 2.5rem / 40% 40% 2.5rem 2.5rem;
+}
+
+/* Corner pixel waves: each pixel pulses with a delay based on its distance from the corner,
+   so the ripple appears to travel outward */
+.pixel-wave {
+  animation: pixel-wave 3.2s ease-in-out infinite;
+}
