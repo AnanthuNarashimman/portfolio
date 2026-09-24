@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import portrait from '../assets/profile-cutout.webp'
+import portrait from '../assets/portrait.webp'
 import { profile } from '../data/profile'
 
 /*
@@ -10,12 +10,13 @@ import { profile } from '../data/profile'
  */
 
 const IMG = 1254
-const CX = 700
-const CY = 905
-const RX = 500
-const RY = 325
+const CX = 665
+const CY = 950
+const RX = 560
+const RY = 280 // top half
+const RY_BOTTOM = 210 // shallower bottom half so the tear stays above the shirt hem
 const SQUARENESS = 3.2 // superellipse exponent: flatter top so the ears stay inside the hole
-const HEAD_CUT = 605 // everything above this line is in front of the paper
+const HEAD_CUT = 700 // everything above this line is in front of the paper
 
 function rng(seed: number) {
   return () => {
@@ -31,7 +32,8 @@ function edgePoint(t: number, s = 1): [number, number] {
   const c = Math.cos(t)
   const n = Math.sin(t)
   const e = 2 / SQUARENESS
-  return [CX + RX * s * Math.sign(c) * Math.abs(c) ** e, CY + RY * s * Math.sign(n) * Math.abs(n) ** e]
+  const ry = n > 0 ? RY_BOTTOM : RY
+  return [CX + RX * s * Math.sign(c) * Math.abs(c) ** e, CY + ry * s * Math.sign(n) * Math.abs(n) ** e]
 }
 
 // Ragged closed outline: slow wobble plus sharp paper-fibre teeth
@@ -77,8 +79,8 @@ function flapPath([a0, a1, reach, twist]: (typeof FLAPS)[number]) {
 const SCRAPS: [number, number, number, number, number][] = [
   [175, 470, 46, -18, 0],
   [1185, 520, 38, 24, 1.2],
-  [135, 1130, 30, 40, 0.6],
-  [1215, 1080, 44, -30, 1.8],
+  [125, 1130, 30, 40, 0.6],
+  [1245, 1110, 40, -30, 1.8],
 ]
 
 function scrapPath(size: number, seed: number) {
@@ -98,9 +100,9 @@ const pop = { type: 'spring', stiffness: 120, damping: 14 } as const
 
 export default function TornPortrait() {
   return (
-    <div className="relative mx-auto aspect-[1180/1290] w-full max-w-md lg:mr-0 lg:w-[min(100%,calc(min(76dvh,700px)*0.915))] lg:max-w-none">
+    <div className="relative mx-auto aspect-[1180/1230] w-full max-w-md lg:mr-0 lg:w-[min(100%,calc(min(76dvh,700px)*0.959))] lg:max-w-none">
       <svg
-        viewBox="95 20 1180 1290"
+        viewBox="95 20 1180 1230"
         className="absolute inset-0 size-full overflow-visible"
         role="img"
         aria-label={`Illustration of ${profile.firstName} bursting through the page`}
@@ -196,7 +198,7 @@ export default function TornPortrait() {
         {[
           [1150, 250, 0.9],
           [255, 300, 0.55],
-          [1225, 860, 0.5],
+          [1235, 800, 0.5],
         ].map(([x, y, s], i) => (
           <motion.path
             key={i}
