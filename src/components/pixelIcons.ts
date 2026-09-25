@@ -1,6 +1,41 @@
-// 12×12 pixel-art versions of the social logos, to match the corner pixel waves.
-// '#' is a filled pixel; drawn with crisp edges so every pixel stays a hard square.
+// Pixel-art icons (social logos are 12×12), to match the corner pixel waves.
+// '#' is a filled pixel, '*' a blinking one; drawn with crisp edges so every pixel stays a hard square.
 export const PIXEL_ICONS = {
+  sun: [
+    '....#....',
+    '.#.....#.',
+    '...###...',
+    '..#####..',
+    '#.#####.#',
+    '..#####..',
+    '...###...',
+    '.#.....#.',
+    '....#....',
+  ],
+  // Crescent (thin tips, thick middle) with a single star pixel
+  moon: [
+    '...###...',
+    '..##...#.',
+    '.###.....',
+    '.###.....',
+    '.###.....',
+    '.###.....',
+    '..##.....',
+    '...###...',
+    '.........',
+  ],
+  // Little terminal monitor with a ">_" prompt; the cursor blinks
+  computer: [
+    '##########',
+    '#........#',
+    '#.#......#',
+    '#..#.....#',
+    '#.#..**..#',
+    '#........#',
+    '##########',
+    '....##....',
+    '..######..',
+  ],
   github: [
     '....####....',
     '..########..',

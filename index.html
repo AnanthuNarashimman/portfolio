@@ -5,10 +5,19 @@
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      // Apply the saved (or system) theme before first paint so dark mode never flashes white
+      try {
+        var saved = localStorage.getItem('theme')
+        var dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.classList.toggle('dark', dark)
+      } catch (e) {}
+    </script>
     <meta name="description" content="On the founding team of a stealth AI startup and building open-source tooling for AI agents — from observability to governance. Shipping AI systems people actually use." />
     <title>Ananthu Narashimman — Agentic AI, Developer Tools, Full-Stack</title>
-    <link rel="preload" href="/fonts/CabinetGrotesk-800.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/CabinetGrotesk-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/GeneralSans-600.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/GeneralSans-500.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body>
     <div id="root"></div>

@@ -1,7 +1,7 @@
 import { motion, type Variants } from 'motion/react'
-import { ArrowRight } from 'lucide-react'
 import { profile } from '../data/profile'
 import PixelButton from './PixelButton'
+import PixelIcon from './PixelIcon'
 import PixelSocialLink from './PixelSocialLink'
 import { socialLinks } from './socialLinks'
 import TornPortrait from './TornPortrait'
@@ -10,6 +10,9 @@ const container: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
 }
+
+// Split the copy so numbers like "100+" and "1,000+" can get the pixel underline
+const summaryParts = profile.summary.split(/(\d[\d,]*\+)/)
 
 const item: Variants = {
   hidden: { opacity: 0, y: 18 },
@@ -23,7 +26,7 @@ export default function Hero() {
       <motion.div variants={container} initial="hidden" animate="show" className="min-w-0 max-w-2xl">
         <motion.h1
           variants={item}
-          className="font-display text-[clamp(2.75rem,min(7vw,11dvh),6.25rem)] leading-[0.92] font-extrabold tracking-[-0.035em] text-accent-50"
+          className="font-display text-[clamp(2.75rem,min(6.2vw,10dvh),5.25rem)] leading-[0.95] font-semibold tracking-[-0.035em] text-accent-50"
         >
           {profile.firstName}
           <br />
@@ -34,7 +37,7 @@ export default function Hero() {
 
         <motion.p
           variants={item}
-          className="mt-[min(1.5rem,2.5dvh)] font-display text-2xl leading-tight font-bold tracking-[-0.01em] text-accent-50 sm:text-3xl xl:text-[2.125rem]"
+          className="mt-[min(2.25rem,3.6dvh)] font-display text-2xl leading-tight font-medium tracking-[-0.015em] text-accent-50 sm:text-3xl xl:text-[2.125rem]"
         >
           {profile.headline.split(' ').slice(0, -1).join(' ')}{' '}
           {/* Last word + accent stay together so the accent never wraps onto a line by itself */}
@@ -43,7 +46,7 @@ export default function Hero() {
             {/* Pixel highlight: gold block with stepped corners and a hard offset shadow */}
             <span className="relative ml-0.5 inline-block">
               <span aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-1 translate-y-1 bg-accent-900/60" />
-              <span className="pixel-corners relative inline-block bg-accent-300 px-2 pb-0.5 font-display leading-tight font-extrabold tracking-[-0.01em] text-accent-800">
+              <span className="pixel-corners relative inline-block bg-accent-300 px-2 pb-0.5 font-display leading-tight font-semibold tracking-[-0.01em] text-accent-800">
                 {profile.headlineAccent}
               </span>
             </span>
@@ -53,15 +56,23 @@ export default function Hero() {
         {/* White, not cream: the only tint that keeps ≥4.5:1 against the lightest red of the card */}
         <motion.p
           variants={item}
-          className="mt-4 max-w-[31em] text-[1.0625rem] leading-relaxed text-white sm:text-lg lg:text-[clamp(1rem,2.05dvh,1.1875rem)]"
+          className="mt-[min(1.75rem,3dvh)] max-w-[26.5em] text-[1.125rem] leading-relaxed text-white sm:text-[1.1875rem] lg:text-[clamp(1.0625rem,2.1dvh,1.1875rem)]"
         >
-          {profile.summary}
+          {summaryParts.map((part, i) =>
+            i % 2 ? (
+              <strong key={i} className="pixel-mark font-bold whitespace-nowrap">
+                {part}
+              </strong>
+            ) : (
+              part
+            ),
+          )}
         </motion.p>
 
-        <motion.div variants={item} className="mt-[min(2rem,3.5dvh)] flex flex-wrap items-center gap-3">
+        <motion.div variants={item} className="mt-[min(2.75rem,4.8dvh)] flex flex-wrap items-center gap-3">
           <PixelButton href="#projects">
             See my work
-            <ArrowRight className="size-4" />
+            <PixelIcon name="computer" className="h-[18px] w-5" />
           </PixelButton>
 
           {/* Below lg the card's right-edge rail is hidden, so the socials sit next to the button */}

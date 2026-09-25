@@ -4,7 +4,7 @@ export const profile = {
   headline: 'Shipping AI systems people actually',
   headlineAccent: 'use.',
   summary:
-    "I'm an AI engineer who likes building and figuring things out along the way. I've built an assessment platform used by 100+ students, shipped AI agents and backend systems, and released npm packages with 1,000+ downloads. I build across the stack and rarely know what I'll build next.",
+    "I'm an AI engineer who takes ideas from rough sketch to production. I've built an assessment platform used by 100+ students, shipped AI agents and backend systems, and released npm packages with 1,000+ downloads. I build across the stack and rarely know what I'll build next.",
   email: 'ananthu.narashimman@gmail.com',
   socials: {
     github: 'https://github.com/AnanthuNarashimman',

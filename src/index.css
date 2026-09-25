@@ -2,21 +2,21 @@
 
 /*
  * Fonts — self-hosted, font-display: swap, only the weights in use.
- * Cabinet Grotesk (display) and Satoshi (body) are from Fontshare (ITF Free Font License);
+ * General Sans (display) and Satoshi (body) are from Fontshare (ITF Free Font License);
  * Geist Mono comes from @fontsource (imported in main.tsx).
  * Each family has a metric-matched local fallback so text doesn't jump when the web font swaps in.
  */
 @font-face {
-  font-family: "Cabinet Grotesk";
-  src: url("/fonts/CabinetGrotesk-700.woff2") format("woff2");
-  font-weight: 700;
+  font-family: "General Sans";
+  src: url("/fonts/GeneralSans-500.woff2") format("woff2");
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Cabinet Grotesk";
-  src: url("/fonts/CabinetGrotesk-800.woff2") format("woff2");
-  font-weight: 800;
+  font-family: "General Sans";
+  src: url("/fonts/GeneralSans-600.woff2") format("woff2");
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
@@ -44,12 +44,12 @@
 
 /* Fallback metrics generated with @capsizecss (size-adjust + ascent/descent/line-gap overrides) */
 @font-face {
-  font-family: "Cabinet Grotesk Fallback";
+  font-family: "General Sans Fallback";
   src: local("Arial");
-  size-adjust: 100.27%;
-  ascent-override: 86.77%;
-  descent-override: 27.92%;
-  line-gap-override: 8.98%;
+  size-adjust: 109.69%;
+  ascent-override: 92.08%;
+  descent-override: 21.88%;
+  line-gap-override: 9.12%;
 }
 @font-face {
   font-family: "Satoshi Fallback";
@@ -69,7 +69,7 @@
 }
 
 @theme {
-  --font-display: "Cabinet Grotesk", "Cabinet Grotesk Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "General Sans", "General Sans Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Satoshi", "Satoshi Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
 
@@ -85,6 +85,7 @@
   --color-accent-800: #8f1414;
   --color-accent-900: #4a0b0b;
   --color-ink: #1c0d0a;
+  --color-night: #1e0f0c; /* dark-theme page background: warm, red-tinted near-black */
   --color-muted: #6e5b52;
 
   --animate-float: float 7s ease-in-out infinite;
@@ -107,8 +108,11 @@ body,
   height: 100%;
 }
 
+/* Dark theme: toggled by the .dark class on <html> (set before first paint by the script in index.html) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
-  @apply bg-white font-sans text-ink antialiased;
+  @apply bg-white font-sans text-ink antialiased transition-colors duration-300 dark:bg-night dark:text-accent-50;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -119,6 +123,24 @@ body {
 
 ::selection {
   @apply bg-accent-200 text-accent-900;
+}
+
+/* Dark-theme page: crimson light spilling from behind the hero card, fading into a warm
+   near-black, over a very faint pixel dot grid */
+.dark .page-bg {
+  background:
+    radial-gradient(90% 60% at 50% 0%, rgb(190 26 26 / 0.22), transparent 70%),
+    radial-gradient(60% 40% at 50% 100%, rgb(143 20 20 / 0.12), transparent 70%),
+    radial-gradient(rgb(248 235 171 / 0.045) 1.5px, transparent 1.5px) 0 0 / 22px 22px,
+    var(--color-night);
+}
+
+/* Dark-theme hero card: one smooth crimson gradient with a soft top light — no blurred glow
+   circles, which read as muddy patches over the deeper red */
+.hero-dark-bg {
+  background:
+    radial-gradient(120% 80% at 35% -10%, rgb(170 32 24 / 0.55), transparent 60%),
+    linear-gradient(160deg, #7a1313 0%, #5f0e0e 45%, #470a0a 100%);
 }
 
 /* Faint line grid that fades out toward the edges of the hero card */
@@ -143,6 +165,30 @@ body {
    so the ripple appears to travel outward */
 .pixel-wave {
   animation: pixel-wave 3.2s ease-in-out infinite;
+}
+
+/* Blinking terminal cursor pixel */
+.pixel-blink {
+  animation: pixel-blink 1.1s steps(1, end) infinite;
+}
+@keyframes pixel-blink {
+  50% { opacity: 0; }
+}
+
+/* Numbers in the hero copy: a faint gold pixel box (stepped corners) with a fine dashed pixel underline */
+.pixel-mark {
+  --px: 2px;
+  background:
+    repeating-linear-gradient(90deg, var(--color-accent-300) 0 3px, transparent 3px 5px) 4px calc(100% - 2px) / calc(100% - 8px) 2px no-repeat,
+    rgb(247 216 127 / 0.14);
+  padding: 0 5px 4px;
+  margin: 0 1px;
+  clip-path: polygon(
+    0 calc(var(--px) * 2), var(--px) calc(var(--px) * 2), var(--px) var(--px), calc(var(--px) * 2) var(--px), calc(var(--px) * 2) 0,
+    calc(100% - var(--px) * 2) 0, calc(100% - var(--px) * 2) var(--px), calc(100% - var(--px)) var(--px), calc(100% - var(--px)) calc(var(--px) * 2), 100% calc(var(--px) * 2),
+    100% calc(100% - var(--px) * 2), calc(100% - var(--px)) calc(100% - var(--px) * 2), calc(100% - var(--px)) calc(100% - var(--px)), calc(100% - var(--px) * 2) calc(100% - var(--px)), calc(100% - var(--px) * 2) 100%,
+    calc(var(--px) * 2) 100%, calc(var(--px) * 2) calc(100% - var(--px)), var(--px) calc(100% - var(--px)), var(--px) calc(100% - var(--px) * 2), 0 calc(100% - var(--px) * 2)
+  );
 }
 
 /* Pixel-art box: two-step staircase corners (step = --px). Used by buttons, social tiles and highlights. */

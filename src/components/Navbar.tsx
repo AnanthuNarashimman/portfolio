@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react'
 import avatar from '../assets/avatar.webp'
 import { navLinks, profile } from '../data/profile'
 import PixelButton from './PixelButton'
+import ThemeToggle from './ThemeToggle'
 
 // One pill: avatar on the left, section links in the middle, "Let's talk" on the right
 export default function Navbar() {
@@ -24,7 +25,7 @@ export default function Navbar() {
           />
         </a>
 
-        <nav className="mx-1 hidden items-center gap-1 md:flex">
+        <nav className="mx-1 mr-auto hidden items-center gap-1 md:flex">
           {navLinks.map((link) => (
             <a
               key={link}
@@ -36,7 +37,10 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <PixelButton href={`mailto:${profile.email}`} variant="cream" className="mr-1 ml-auto md:ml-1">
+        <div className="ml-auto flex md:ml-0">
+          <ThemeToggle />
+        </div>
+        <PixelButton href={`mailto:${profile.email}`} variant="cream" className="mr-1 ml-2">
           Let's talk
           <ArrowUpRight className="size-4" />
         </PixelButton>
