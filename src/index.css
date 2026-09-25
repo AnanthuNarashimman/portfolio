@@ -125,13 +125,11 @@ body {
   @apply bg-accent-200 text-accent-900;
 }
 
-/* Dark-theme page: crimson light spilling from behind the hero card, fading into a warm
-   near-black, over a very faint pixel dot grid */
+/* Dark-theme page: crimson light spilling from behind the hero card, fading into a warm near-black */
 .dark .page-bg {
   background:
     radial-gradient(90% 60% at 50% 0%, rgb(190 26 26 / 0.22), transparent 70%),
     radial-gradient(60% 40% at 50% 100%, rgb(143 20 20 / 0.12), transparent 70%),
-    radial-gradient(rgb(248 235 171 / 0.045) 1.5px, transparent 1.5px) 0 0 / 22px 22px,
     var(--color-night);
 }
 

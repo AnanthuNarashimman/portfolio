@@ -1,0 +1,267 @@
+/*
+ * Interlude scene animations. Everything is transform/opacity only (no filters), so it stays
+ * smooth on any laptop. Effect elements remount every beat, which restarts their animation.
+ */
+.fx {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.fx-bottom {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.fx-left {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+}
+
+@keyframes b-pop {
+  0% { transform: scale(0); opacity: 0; }
+  65% { transform: scale(1.14); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes b-out {
+  to { opacity: 0; }
+}
+@keyframes b-flash {
+  0% { opacity: 0; }
+  18% { opacity: 0.18; }
+  100% { opacity: 0; }
+}
+@keyframes b-burst {
+  0% { transform: scale(0.2) rotate(-12deg); opacity: 1; }
+  30% { transform: scale(1.15) rotate(4deg); }
+  55% { transform: scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+@keyframes b-rise {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  20% { opacity: 0.95; }
+  100% { transform: translate(var(--dx, 0px), var(--dy, -70px)) scale(1.7); opacity: 0; }
+}
+@keyframes b-fly {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--r, 180deg)); opacity: 0; }
+}
+@keyframes b-converge {
+  0% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes b-pulse {
+  from { transform: scale(0.75); }
+  to { transform: scale(1.15); }
+}
+@keyframes b-grow {
+  from { transform: scale(0.3); opacity: 0.4; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes b-beam {
+  0% { transform: scaleX(0); opacity: 1; }
+  10% { transform: scaleX(1) scaleY(1.25); }
+  20% { transform: scaleX(1) scaleY(1); opacity: 1; }
+  75% { transform: scaleX(1) scaleY(1); opacity: 1; }
+  100% { transform: scaleX(1) scaleY(0); opacity: 0; }
+}
+@keyframes b-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+@keyframes b-ring {
+  from { transform: scale(0.2); opacity: 1; }
+  to { transform: scale(2.6); opacity: 0; }
+}
+@keyframes b-float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-7px); }
+}
+@keyframes b-laugh {
+  0%, 100% { transform: rotate(-9deg) translateY(0); }
+  50% { transform: rotate(9deg) translateY(-4px); }
+}
+@keyframes b-die {
+  0%, 11% { transform: scale(1); opacity: 1; }
+  13% { transform: scale(1.25); opacity: 1; }
+  15%, 100% { transform: scale(0.2); opacity: 0; }
+}
+@keyframes b-respawn {
+  0%, 62% { transform: scale(0.2); opacity: 0; }
+  78% { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes b-assemble {
+  0%, 45% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+  55% { opacity: 1; }
+  66% { transform: translate(0, 0); opacity: 1; }
+  72%, 100% { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes b-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes b-wobble {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+@keyframes b-fall {
+  0% { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(var(--dx, 0px), 48px); opacity: 0; }
+}
+@keyframes b-draw {
+  0% { stroke-dashoffset: 80; opacity: 0; }
+  20% { opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; transform: translateY(-16px); }
+}
+@keyframes b-squash {
+  0% { transform: scale(1.03, 0.97); }
+  100% { transform: scale(1, 1); }
+}
+@keyframes b-shake {
+  0% { transform: translate(0, 0); }
+  12% { transform: translate(-7px, 3px); }
+  25% { transform: translate(6px, -4px); }
+  37% { transform: translate(-5px, -2px); }
+  50% { transform: translate(4px, 3px); }
+  62% { transform: translate(-3px, 1px); }
+  75% { transform: translate(2px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes b-shake-sm {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-3px, 1px); }
+  50% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, 1px); }
+}
+@keyframes b-steam {
+  0% { transform: translateY(0); opacity: 0; }
+  30% { opacity: 0.7; }
+  100% { transform: translateY(-22px); opacity: 0; }
+}
+@keyframes b-blink {
+  50% { opacity: 0; }
+}
+
+.b-steam {
+  animation: b-steam 2.6s ease-out infinite;
+}
+.b-cursor {
+  animation: b-blink 1s steps(1, end) infinite;
+}
+
+/* ---------- Pixel-art motion: whole-pixel jumps (stage units, 4 per art pixel) ---------- */
+
+/* Sprite sheet playback: shift the strip one frame per step */
+@keyframes b-sprite {
+  from { transform: translateX(0); }
+  to { transform: translateX(var(--sheet)); }
+}
+@keyframes b-pop-px {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes b-rise-px {
+  from { transform: translateY(0); }
+  to { transform: translateY(-48px); }
+}
+@keyframes b-bob-px {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+@keyframes b-flicker-px {
+  50% { opacity: 0.25; }
+}
+/* Beam: snaps on in a few whole-pixel steps, holds, then cuts out */
+@keyframes b-beam-px {
+  0% { clip-path: inset(0 100% 0 0); animation-timing-function: steps(5); }
+  12% { clip-path: inset(0 0 0 0); }
+  82% { opacity: 1; animation-timing-function: steps(2); }
+  100% { clip-path: inset(40% 0 40% 0); opacity: 0; }
+}
+@keyframes b-shake-px {
+  0% { transform: translate(0, 0); }
+  12% { transform: translate(-8px, 4px); }
+  25% { transform: translate(8px, -4px); }
+  37% { transform: translate(-4px, -4px); }
+  50% { transform: translate(4px, 4px); }
+  62% { transform: translate(-4px, 0); }
+  75% { transform: translate(4px, -4px); }
+  88%, 100% { transform: translate(0, 0); }
+}
+@keyframes b-shake-px-sm {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(-4px, 0); }
+  66% { transform: translate(4px, 0); }
+  100% { transform: translate(0, 0); }
+}
+/* Dummy sheet frames: 0 clean · 1 scorched upright · 2..9 scorched tilts (7°,13°,9°,-5°,-3°,3°,1°,-1°) */
+@keyframes b-dummy-hit {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-192px); }
+  23% { transform: translateX(-288px); }
+  29% { transform: translateX(-384px); }
+  34% { transform: translateX(-96px); }
+  40% { transform: translateX(-480px); }
+  48% { transform: translateX(-576px); }
+  56% { transform: translateX(-96px); }
+  63% { transform: translateX(-672px); }
+  70% { transform: translateX(-768px); }
+  78% { transform: translateX(-864px); }
+  86%, 100% { transform: translateX(-96px); }
+}
+@keyframes b-dummy-reset {
+  0% { transform: translateX(-96px); }
+  72%, 100% { transform: translateX(0); }
+}
+
+/* ---------- Interlude backdrop band ---------- */
+.wave-scroll {
+  animation: wave-scroll linear infinite;
+  will-change: transform;
+}
+@keyframes wave-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(var(--period)); }
+}
+.band-spark {
+  opacity: 0;
+  animation: band-spark linear infinite;
+}
+@keyframes band-spark {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  80% { opacity: 0.5; }
+  100% { transform: translateY(-420px); opacity: 0; }
+}
+
+/* ---------- Heading mosaic tiles (light: yellow → peach → pink; dark: ember reds) ---------- */
+.m-r0 { fill: #ffd86b; }
+.m-r1 { fill: #ffcd70; }
+.m-r2 { fill: #ffc176; }
+.m-r3 { fill: #ffb57c; }
+.m-r4 { fill: #ffaa82; }
+.m-r5 { fill: #ffa088; }
+.m-r6 { fill: #ff978c; }
+.m-r7 { fill: #ff8f8e; }
+.m-a0 { fill: #ff8a1f; }
+.m-a1 { fill: #f25546; }
+.m-a2 { fill: #ffbf00; }
+.dark .m-r0 { fill: #8a5a18; }
+.dark .m-r1 { fill: #87521a; }
+.dark .m-r2 { fill: #844a1c; }
+.dark .m-r3 { fill: #81421e; }
+.dark .m-r4 { fill: #7e3b20; }
+.dark .m-r5 { fill: #7b3422; }
+.dark .m-r6 { fill: #782e24; }
+.dark .m-r7 { fill: #752826; }
+.dark .m-a0 { fill: #d0701c; }
+.dark .m-a1 { fill: #c9382c; }
+.dark .m-a2 { fill: #d9a21a; }
+.mosaic-twinkle {
+  opacity: 0;
+  animation: mosaic-twinkle ease-in-out infinite;
+}
+@keyframes mosaic-twinkle {
+  0%, 70%, 100% { opacity: 0; }
+  80%, 88% { opacity: 1; }
+}
