@@ -86,6 +86,7 @@
   --color-accent-900: #4a0b0b;
   --color-ink: #1c0d0a;
   --color-night: #1e0f0c; /* dark-theme page background: warm, red-tinted near-black */
+  --color-paper: #fcece6; /* light-theme page background: a soft reddish white */
   --color-muted: #6e5b52;
 
   --animate-float: float 7s ease-in-out infinite;
@@ -112,7 +113,7 @@ body,
 @custom-variant dark (&:where(.dark, .dark *));
 
 body {
-  @apply bg-white font-sans text-ink antialiased transition-colors duration-300 dark:bg-night dark:text-accent-50;
+  @apply bg-paper font-sans text-ink antialiased transition-colors duration-300 dark:bg-night dark:text-accent-50;
 }
 
 @media (prefers-reduced-motion: no-preference) {

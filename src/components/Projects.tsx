@@ -1,6 +1,8 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router'
 import { GithubIcon } from './SocialIcons'
+import NpmPackages from './NpmPackages'
+import './projects.css'
 import type { CSSProperties } from 'react'
 import { projects, type Project } from '../data/projects'
 
@@ -58,6 +60,91 @@ function ImagePlaceholder({ index, title }: { index: number; title: string }) {
   )
 }
 
+// Deterministic pseudo-random so the rain looks the same every render
+const rand = (i: number, k: number) => (((Math.sin(i * 12.9898 + k * 78.233) * 43758.5453) % 1) + 1) % 1
+
+const RAIN = Array.from({ length: 32 }, (_, i) => ({
+  left: `${(i / 32) * 100 + rand(i, 1) * 1.8}%`,
+  size: rand(i, 2) > 0.6 ? 10 : 7,
+  len: 4 + Math.floor(rand(i, 3) * 4),
+  dur: 16 + rand(i, 4) * 14,
+  delay: -rand(i, 5) * 30,
+  gold: rand(i, 6) > 0.5,
+}))
+
+/** Stepped pixel line that closes the section */
+function PixelDivider() {
+  return (
+    <div aria-hidden="true" className="-mx-5 mt-24 flex items-end sm:-mx-8">
+      {Array.from({ length: 96 }, (_, i) => {
+        const h = [4, 4, 8, 4, 4, 4, 12, 4, 8, 4, 4, 4][i % 12]
+        return (
+          <span key={i} className={`flex-1 ${h > 4 ? 'bg-accent-400 dark:bg-accent-400/80' : 'bg-accent-600 dark:bg-accent-600/80'}`} style={{ height: h }} />
+        )
+      })}
+    </div>
+  )
+}
+
+/** Falling pixel trails behind the whole section */
+function PixelRain() {
+  return (
+    <div aria-hidden="true" className="pixel-rain pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      {RAIN.map((r, i) => (
+        <span key={i} style={{ left: r.left, animationDuration: `${r.dur}s`, animationDelay: `${r.delay}s` }}>
+          {Array.from({ length: r.len }, (_, k) => (
+            <i
+              key={k}
+              className={r.gold ? 'bg-accent-300 dark:bg-accent-300/80' : 'bg-accent-500/80 dark:bg-accent-500/70'}
+              style={{ width: r.size, height: r.size, opacity: ((k + 1) / r.len) * 0.95 }}
+            />
+          ))}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+const RISE = Array.from({ length: 12 }, (_, i) => ({
+  left: 6 + i * 8 + rand(i, 7) * 4,
+  size: rand(i, 8) > 0.6 ? 8 : 5,
+  delay: rand(i, 9) * 1.5,
+  gold: i % 3 !== 0,
+}))
+
+/** Pixels floating up out of the card while it's hovered */
+function RisingPixels() {
+  return (
+    <div aria-hidden="true" className="card-rise pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40">
+      {RISE.map((p, i) => (
+        <span
+          key={i}
+          className={`absolute bottom-2 ${p.gold ? 'bg-accent-300' : 'bg-accent-500'}`}
+          style={{ left: `${p.left}%`, width: p.size, height: p.size, animationDelay: `${p.delay}s` }}
+        />
+      ))}
+    </div>
+  )
+}
+
+/** Stepped pixel staircase tucked into the card's bottom-right corner */
+function CornerStairs() {
+  const cells: [number, number][] = []
+  for (let r = 0; r < 5; r++) for (let c = 4 - r; c < 5; c++) cells.push([c, r])
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 5 5"
+      shapeRendering="crispEdges"
+      className="pointer-events-none absolute right-3 bottom-3 -z-10 w-12 text-accent-600/20 dark:text-accent-400/20"
+    >
+      {cells.map(([c, r]) => (
+        <rect key={`${c}-${r}`} x={c} y={r} width={0.8} height={0.8} fill="currentColor" />
+      ))}
+    </svg>
+  )
+}
+
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
     <article className="group relative">
@@ -67,7 +154,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         className="pixel-corners relative h-full bg-accent-600 p-[3px] transition-transform duration-200 group-hover:translate-x-1 group-hover:translate-y-1 dark:bg-accent-700"
         style={px(6)}
       >
-        <div className="pixel-corners flex h-full flex-col overflow-hidden bg-white dark:bg-[#1f1210]" style={px(6)}>
+        <div className="card-body pixel-corners relative flex h-full flex-col overflow-hidden" style={px(6)}>
           {project.image ? (
             <img src={project.image} alt={`${project.title} screenshot`} className="aspect-[16/9] w-full object-cover object-top" loading="lazy" />
           ) : (
@@ -75,7 +162,10 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           )}
           <div className="h-[3px] bg-accent-600 dark:bg-accent-700" />
 
-          <div className="flex flex-1 flex-col p-6">
+          <div className="relative isolate flex flex-1 flex-col p-6">
+            <div aria-hidden="true" className="card-grid pointer-events-none absolute inset-0 -z-10" />
+            <CornerStairs />
+            <RisingPixels />
             <div className="flex items-center gap-2 font-mono text-[11px] tracking-[0.18em] uppercase">
               <span className="text-accent-700 dark:text-accent-300">CH {String(index + 1).padStart(2, '0')}</span>
               <span
@@ -152,7 +242,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
 export default function Projects() {
   return (
-    <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-4 px-5 py-24 sm:px-8">
+    <section id="projects" className="relative isolate mx-auto w-full max-w-7xl scroll-mt-4 px-5 pt-24 sm:px-8">
+      <PixelRain />
       <div className="lg:px-16">
         <p className="font-mono text-xs tracking-[0.2em] text-accent-700 uppercase dark:text-accent-300">Featured projects</p>
         <h2 className="mt-3 font-display text-4xl font-semibold tracking-[-0.03em] text-ink sm:text-5xl dark:text-accent-50">Work, live on air.</h2>
@@ -163,6 +254,8 @@ export default function Projects() {
           <ProjectCard key={p.slug} project={p} index={i} />
         ))}
       </div>
+
+      <NpmPackages />
 
       <div className="mt-14 flex justify-center">
         {/* Not wired up yet — the full projects page comes later */}
@@ -177,6 +270,9 @@ export default function Projects() {
           </span>
         </a>
       </div>
+
+      {/* Pixel divider: ends the section, and the pixel rain lands on it */}
+      <PixelDivider />
     </section>
   )
 }

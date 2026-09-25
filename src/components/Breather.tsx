@@ -10,9 +10,8 @@ import f07 from '../assets/titan/f07.webp'
 import f08 from '../assets/titan/f08.webp'
 import f09 from '../assets/titan/f09.webp'
 import f10 from '../assets/titan/f10.webp'
-import { BEAM_H, BEAM_LEN, buildLabArt, DUMMY_FH, DUMMY_FW, DUMMY_PIVOT, P, pixelTextPath, pixelTextWidth, type LabArt } from './labPixels'
+import { BEAM_H, BEAM_LEN, PAD, buildLabArt, DUMMY_FH, DUMMY_FW, DUMMY_PIVOT, P, pixelTextPath, pixelTextWidth, type LabArt } from './labPixels'
 import PixelWaveBand from './PixelWaveBand'
-import TextMosaic from './TextMosaic'
 import './breather.css'
 
 /*
@@ -45,6 +44,8 @@ const BEATS: { fx: Fx; ms: number }[] = [
 // Stage is 1280 × 440 units. The character/bench/dummy layout sits DX right of centre-left,
 // leaving room for the armor pod (left) and server rack (right)
 const W = 1280
+const EXT = PAD * P // extra units drawn left/right of the core stage
+const VIEW = `${-EXT} 0 ${W + EXT * 2} 440`
 const DX = 140
 // Character placement: frames are 551×600 source px, drawn as 166×181 art pixels at (OX, OY)
 const OX = 160 + DX
@@ -506,9 +507,9 @@ export default function Breather() {
   const dummyAnim = still ? undefined : fx === 'fire' ? 'b-dummy-hit 1400ms step-end both' : fx === 'victory' ? 'b-dummy-reset 1900ms step-end both' : undefined
 
   return (
-    <section ref={ref} aria-label="Interlude" className="relative isolate mt-6 hidden overflow-hidden py-28 lg:block">
+    <section ref={ref} aria-label="Interlude" className="relative isolate mt-16 hidden overflow-hidden py-28 lg:block">
       <PixelWaveBand />
-      <div className="mx-auto w-full max-w-7xl px-8">
+      <div className="mx-auto w-full max-w-[1760px] px-10">
         {/* Centred heading on a small pixel-tile plate that hugs the text */}
         <div className="text-center">
           {/* Framed like the project cards: hard offset shadow, crimson pixel border, solid gaps between tiles */}
@@ -519,16 +520,17 @@ export default function Breather() {
               style={vars({ '--px': '6px' })}
             />
             <div className="pixel-corners relative bg-accent-600 p-[2px] dark:bg-accent-400/70" style={vars({ '--px': '6px' })}>
-              <div className="pixel-corners relative isolate overflow-hidden bg-[#fff7ef] px-7 py-3.5 dark:bg-night" style={vars({ '--px': '6px' })}>
-                <TextMosaic />
-                <div aria-hidden="true" className="absolute inset-0 bg-white/15 dark:bg-transparent" />
-                <h2 className="relative font-display text-3xl leading-tight font-semibold tracking-[-0.03em] text-ink dark:text-accent-50">
-                  Break it. Figure it out. Ship it{' '}
-                  <span className="relative ml-1 inline-block">
-                    <span aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-1 translate-y-1 bg-accent-900/70" />
-                    <span className="pixel-corners relative inline-block bg-accent-300 px-2.5 pb-0.5 text-accent-800">anyway.</span>
-                  </span>
-                </h2>
+              {/* Uniform pixel stroke (a checker of theme squares) framing a solid crimson plate */}
+              <div className="pixel-stroke pixel-corners relative p-2.5" style={vars({ '--px': '3px' })}>
+                <div className="relative bg-accent-700 px-6 py-3 dark:bg-accent-900">
+                  <h2 className="font-display text-3xl leading-tight font-semibold tracking-[-0.025em] text-accent-50">
+                    Break it. Figure it out. Ship it{' '}
+                    <span className="relative ml-1 inline-block">
+                      <span aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-1 translate-y-1 bg-black/40" />
+                      <span className="pixel-corners relative inline-block bg-accent-300 px-2.5 pb-0.5 text-accent-800">anyway.</span>
+                    </span>
+                  </h2>
+                </div>
               </div>
             </div>
           </div>
@@ -541,14 +543,15 @@ export default function Breather() {
         >
           <div className="pixel-corners bg-[#141010] shadow-2xl shadow-ink/25" style={vars({ '--px': '8px' })}>
             <svg
-              viewBox={`0 0 ${W} 440`}
-              className="block w-full"
+              viewBox={VIEW}
+            preserveAspectRatio="xMidYMid slice"
+              className="block h-[min(420px,calc((100vw-80px)*0.34375))] w-full"
               role="img"
               aria-label="Pixel-art test bay: a tiny Ananthu fires a homemade repulsor glove at a crash-test dummy; it backfires, he scratches his head, flips the glove around, and knocks the dummy back with a direct hit."
             >
               {art && (
                 <>
-                  <image href={art.backdrop} width={W} height={440} style={pixelated} />
+                  <image href={art.backdrop} x={-EXT} width={W + EXT * 2} height={440} style={pixelated} />
                   <Holo fx={fx} attempt={loop + 1} />
                   {!still && <RackLeds />}
 
@@ -580,7 +583,7 @@ export default function Breather() {
                   </g>
 
                   {fx === 'backfire' && !still && (
-                    <rect key={`flash-${key}`} width={W} height="440" fill="#ff9a4a" style={anim('b-flash 300ms steps(3) both')} />
+                    <rect key={`flash-${key}`} x={-EXT} width={W + EXT * 2} height="440" fill="#ff9a4a" style={anim('b-flash 300ms steps(3) both')} />
                   )}
                 </>
               )}

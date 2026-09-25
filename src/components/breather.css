@@ -234,37 +234,20 @@
   100% { transform: translateY(-420px); opacity: 0; }
 }
 
-/* ---------- Heading mosaic tiles, on the theme palette ----------
-   Light: cream (#f8ebab) → gold (#f7d87f) → orange (#e98a3f) → toward vermilion (#dc4a28);
-   accents vermilion, crimson (#be1a1a) and a cream sparkle.
-   Dark: the same ramp dimmed into the ember reds (#4a0b0b / #8f1414). */
-.m-r0 { fill: #f8ebab; }
-.m-r1 { fill: #f7e196; }
-.m-r2 { fill: #f7d87f; }
-.m-r3 { fill: #f2c26a; }
-.m-r4 { fill: #eeab56; }
-.m-r5 { fill: #e98a3f; }
-.m-r6 { fill: #e37638; }
-.m-r7 { fill: #dc6230; }
-.m-a0 { fill: #dc4a28; }
-.m-a1 { fill: #be1a1a; }
-.m-a2 { fill: #fff7ef; }
-.dark .m-r0 { fill: #77591e; }
-.dark .m-r1 { fill: #784d1c; }
-.dark .m-r2 { fill: #78421b; }
-.dark .m-r3 { fill: #79381a; }
-.dark .m-r4 { fill: #7a2f19; }
-.dark .m-r5 { fill: #7b2718; }
-.dark .m-r6 { fill: #731f16; }
-.dark .m-r7 { fill: #6a1814; }
-.dark .m-a0 { fill: #d0741f; }
-.dark .m-a1 { fill: #d0311e; }
-.dark .m-a2 { fill: #e0b54a; }
-.mosaic-twinkle {
-  opacity: 0;
-  animation: mosaic-twinkle ease-in-out infinite;
+/* ---------- Heading frame: solid gold band, corners joined to the plate in its crimson ---------- */
+.pixel-stroke {
+  background:
+    linear-gradient(var(--color-accent-700), var(--color-accent-700)) 0 0 / 16px 16px no-repeat,
+    linear-gradient(var(--color-accent-700), var(--color-accent-700)) 100% 0 / 16px 16px no-repeat,
+    linear-gradient(var(--color-accent-700), var(--color-accent-700)) 0 100% / 16px 16px no-repeat,
+    linear-gradient(var(--color-accent-700), var(--color-accent-700)) 100% 100% / 16px 16px no-repeat,
+    var(--color-accent-300);
 }
-@keyframes mosaic-twinkle {
-  0%, 70%, 100% { opacity: 0; }
-  80%, 88% { opacity: 1; }
+.dark .pixel-stroke {
+  background:
+    linear-gradient(var(--color-accent-900), var(--color-accent-900)) 0 0 / 16px 16px no-repeat,
+    linear-gradient(var(--color-accent-900), var(--color-accent-900)) 100% 0 / 16px 16px no-repeat,
+    linear-gradient(var(--color-accent-900), var(--color-accent-900)) 0 100% / 16px 16px no-repeat,
+    linear-gradient(var(--color-accent-900), var(--color-accent-900)) 100% 100% / 16px 16px no-repeat,
+    #e0b54a;
 }

@@ -18,7 +18,7 @@ export default function Home() {
   }, [hash])
 
   return (
-    <main className="page-bg bg-white transition-colors duration-300">
+    <main className="page-bg bg-paper transition-colors duration-300">
       <div className="min-h-dvh p-2.5 sm:p-4 lg:h-dvh">
         {/* Hero card: stepped pixel corners, with a hard pixel shadow block behind (clip-path can't carry a box-shadow) */}
         <div className="relative lg:h-full">

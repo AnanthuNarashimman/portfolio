@@ -75,7 +75,7 @@ export default function ProjectPage() {
   const d = project.detail
 
   return (
-    <main className="page-bg min-h-dvh bg-white pb-24 transition-colors duration-300">
+    <main className="page-bg min-h-dvh bg-paper pb-24 transition-colors duration-300">
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
         {/* Top bar */}
         <div className="flex items-center justify-between py-6">

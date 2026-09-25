@@ -7,7 +7,7 @@ const links = [...socialLinks, { href: `mailto:${profile.email}`, label: 'Email'
 // Minimal contact block — the nav's "Contact" link scrolls here; the full contact section comes later
 export default function Contact() {
   return (
-    <section id="contact" className="mx-auto w-full max-w-7xl scroll-mt-4 px-5 pb-16 sm:px-8 lg:px-24">
+    <section id="contact" className="mx-auto w-full max-w-7xl scroll-mt-4 px-5 pt-24 pb-16 sm:px-8 lg:px-24">
       <div className="rounded-[2rem] bg-accent-50 p-8 ring-1 ring-accent-200 transition-colors duration-300 sm:p-12 dark:bg-white/[0.04] dark:ring-white/10">
         <p className="font-mono text-xs tracking-[0.2em] text-accent-700 uppercase dark:text-accent-300">Contact</p>
         <h2 className="mt-3 font-display text-4xl font-semibold tracking-[-0.03em] text-ink sm:text-5xl dark:text-accent-50">

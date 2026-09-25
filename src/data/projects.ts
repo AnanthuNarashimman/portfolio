@@ -266,3 +266,26 @@ export const projects: Project[] = [
     },
   },
 ]
+
+// Published npm packages (shown as their own block under the project cards)
+export type NpmPackage = {
+  name: string
+  oneLiner: string
+  downloads: number
+  npm: string
+}
+
+export const npmPackages: NpmPackage[] = [
+  {
+    name: 'tracetel',
+    oneLiner: 'Turns every Composio tool call into an OpenTelemetry span, streamed to Agnost or any OTel backend.',
+    downloads: 983,
+    npm: 'https://www.npmjs.com/package/tracetel',
+  },
+  {
+    name: '@flash_dev/agent-smith',
+    oneLiner: 'A goal-fidelity watchdog for AI coding agents: flags every risky action that contradicts what you said you were building.',
+    downloads: 105,
+    npm: 'https://www.npmjs.com/package/@flash_dev/agent-smith',
+  },
+]

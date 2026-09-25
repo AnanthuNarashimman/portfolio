@@ -7,7 +7,8 @@
  */
 
 export const P = 4 // stage units per layout pixel (art is drawn at R× this, see R)
-export const GW = 320 // backdrop width in layout pixels (1280 units)
+export const GW = 320 // core stage width in layout pixels (1280 units)
+export const PAD = 60 // extra wall/floor drawn on each side (240 units), so the panel can extend without scaling
 export const GH = 110 // backdrop height in pixels (440 units)
 
 type RGB = [number, number, number]
@@ -199,19 +200,21 @@ export const pixelTextWidth = (text: string, s: number) => text.length * s * 4 -
 export const R = 2
 
 export function drawBackdrop() {
-  const c = new Canvas(GW * R, GH * R)
+  const c = new Canvas((GW + PAD * 2) * R, GH * R)
   const HZ = 88 // horizon row (352 units)
   const DX = 35 // bench/backstop/dummy layout offset in the wider stage
 
   // Helpers in layout-grid coordinates; fractional sizes give half-size (fine) details
   const rect = (x: number, y: number, w: number, h: number, col: RGB) =>
-    c.rect(Math.round(x * R), Math.round(y * R), Math.max(1, Math.round(w * R)), Math.max(1, Math.round(h * R)), col)
-  const dot = (x: number, y: number, col: RGB) => c.set(Math.round(x * R), Math.round(y * R), col)
-  const line = (x0: number, y0: number, x1: number, y1: number, col: RGB) => c.line(x0 * R, y0 * R, x1 * R, y1 * R, col)
+    c.rect(Math.round((x + PAD) * R), Math.round(y * R), Math.max(1, Math.round(w * R)), Math.max(1, Math.round(h * R)), col)
+  const dot = (x: number, y: number, col: RGB) => c.set(Math.round((x + PAD) * R), Math.round(y * R), col)
+  const line = (x0: number, y0: number, x1: number, y1: number, col: RGB) => c.line((x0 + PAD) * R, y0 * R, (x1 + PAD) * R, y1 * R, col)
   const area = (x0: number, y0: number, x1: number, y1: number, f: (fx: number, fy: number, lx: number, ly: number) => void) => {
     for (let fy = Math.max(0, Math.floor(y0 * R)); fy < Math.min(c.h, Math.ceil(y1 * R)); fy++)
-      for (let fx = Math.max(0, Math.floor(x0 * R)); fx < Math.min(c.w, Math.ceil(x1 * R)); fx++) f(fx, fy, fx / R, fy / R)
+      for (let fx = Math.max(0, Math.floor((x0 + PAD) * R)); fx < Math.min(c.w, Math.ceil((x1 + PAD) * R)); fx++) f(fx, fy, fx / R - PAD, fy / R)
   }
+  const L = -PAD // full-canvas left edge in core coordinates
+  const FULL = GW + PAD * 2
   const stencil = (text: string, x: number, y: number, s: number, col: RGB) => {
     let cx = x
     for (const ch of text) {
@@ -222,19 +225,19 @@ export function drawBackdrop() {
   }
 
   // Wall: two tones dithered top→bottom, darker lower band, ceiling rail, panel seams
-  area(0, 0, GW, HZ, (fx, fy, _lx, ly) => {
+  area(L, 0, GW + PAD, HZ, (fx, fy, _lx, ly) => {
     c.set(fx, fy, WALL_LO)
     c.shade(fx, fy, 0.35 + (ly / HZ) * 0.5, WALL_HI, 5)
   })
-  area(0, 65, GW, HZ, (fx, fy) => c.shade(fx, fy, 0.5, SEAM, 4))
-  rect(0, 0, GW, 4, SEAM)
-  rect(0, 4, GW, 0.5, SEAM_HI)
-  for (let x = 16; x < GW; x += 32) {
+  area(L, 65, GW + PAD, HZ, (fx, fy) => c.shade(fx, fy, 0.5, SEAM, 4))
+  rect(L, 0, FULL, 4, SEAM)
+  rect(L, 4, FULL, 0.5, SEAM_HI)
+  for (let x = 16 - 64; x < GW + PAD; x += 32) {
     rect(x, 5, 0.5, HZ - 5, SEAM)
     rect(x + 0.5, 5, 0.5, HZ - 5, SEAM_HI)
   }
-  rect(0, 65, GW, 0.5, SEAM_HI)
-  rect(0, 65.5, GW, 0.5, SEAM)
+  rect(L, 65, FULL, 0.5, SEAM_HI)
+  rect(L, 65.5, FULL, 0.5, SEAM)
 
   // Warm backlight on the wall behind the character (keeps dark hair readable)
   area(DX, 5, DX + 170, HZ, (fx, fy, lx, ly) => {
@@ -366,12 +369,12 @@ export function drawBackdrop() {
           else if (right === -1) col = [col[0] + (RIM[0] - col[0]) * 0.45, col[1] + (RIM[1] - col[1]) * 0.45, col[2] + (RIM[2] - col[2]) * 0.45]
           else if (nb(-1, 0) === -1) col = [col[0] * 0.7, col[1] * 0.7, col[2] * 0.7]
         }
-        c.set(Math.round(X0 * R) + fx, Math.round(Y0 * R) + fy, col)
+        c.set(Math.round((X0 + PAD) * R) + fx, Math.round(Y0 * R) + fy, col)
       }
     // Soft glow spill from the arc reactor and palms onto the dark pod
     area(17, 33, 33, 48, (fx, fy, lx, ly) => {
       const d = Math.hypot(lx - 25, ly - 40.4)
-      if (d > 2.8 && d < 7 && ids[(fy - Math.round(Y0 * R)) * fw + (fx - Math.round(X0 * R))] < 0) c.shade(fx, fy, (7 - d) / 7, AMBER, 4)
+      if (d > 2.8 && d < 7 && ids[(fy - Math.round(Y0 * R)) * fw + (fx - Math.round((X0 + PAD) * R))] < 0) c.shade(fx, fy, (7 - d) / 7, AMBER, 4)
     })
   }
   // Glass: frame, top cap, base with light strip
@@ -479,14 +482,14 @@ export function drawBackdrop() {
   }
 
   // Floor: dithered concrete, perspective seams
-  area(0, HZ, GW, GH, (fx, fy, _lx, ly) => {
+  area(L, HZ, GW + PAD, GH, (fx, fy, _lx, ly) => {
     c.set(fx, fy, hex('#141010'))
     c.shade(fx, fy, 1 - (ly - HZ) / (GH - HZ), hex('#2c2321'), 5)
   })
-  rect(0, HZ, GW, 0.5, SEAM_HI)
+  rect(L, HZ, FULL, 0.5, SEAM_HI)
   const vx = 160
-  for (const bxs of [-230, -130, -45, 30, 100, 175, 255, 340, 440, 540]) line(vx + (bxs - vx) * 0.35, HZ + 0.5, bxs, GH, SEAM)
-  rect(0, 95, GW, 0.5, SEAM)
+  for (const bxs of [-420, -320, -230, -130, -45, 30, 100, 175, 255, 340, 440, 540, 640, 740]) line(vx + (bxs - vx) * 0.35, HZ + 0.5, bxs, GH, SEAM)
+  rect(L, 95, FULL, 0.5, SEAM)
 
   // Cables snaking out of the armor pod's base across the floor (drawn after the floor so they sit on it)
   const cable = (p: number[][], col: RGB, hi: RGB, w = 1.2) => {
@@ -519,9 +522,40 @@ export function drawBackdrop() {
     if (r > 0.6 && r < 1) c.set(fx, fy, r > 0.9 ? RUBBER_HI : RUBBER)
   })
 
+  // Left extension: a bank of steel lockers with vents and name tags
+  for (let i = 0; i < 3; i++) {
+    const lx = -54 + i * 15
+    rect(lx, 30, 14, HZ - 30, STEEL[1])
+    rect(lx, 30, 14, 0.5, STEEL[3])
+    rect(lx, 30, 0.5, HZ - 30, STEEL[2])
+    rect(lx + 13.5, 30, 0.5, HZ - 30, K)
+    for (let v = 0; v < 4; v++) rect(lx + 3, 35 + v * 2, 8, 0.5, K)
+    rect(lx + 4.5, 46, 5, 3, hex('#d9cfc4'))
+    rect(lx + 11, 56, 1, 5, STEEL[4])
+    for (let v = 0; v < 3; v++) rect(lx + 3, 70 + v * 2, 8, 0.5, K)
+  }
+  rect(-56, 29, 48, 1, K)
+
+  // Right extension: stacked supply crates and a traffic cone
+  const crate = (x: number, y: number, w: number, h: number) => {
+    rect(x, y, w, h, hex('#6b4a2b'))
+    rect(x, y, w, 0.5, hex('#8e6a44'))
+    rect(x, y, 0.5, h, hex('#8e6a44'))
+    rect(x + w - 0.5, y, 0.5, h, K)
+    rect(x, y + h - 0.5, w, 0.5, K)
+    line(x + 1, y + 1, x + w - 1, y + h - 1, hex('#523620'))
+    line(x + w - 1, y + 1, x + 1, y + h - 1, hex('#523620'))
+    rect(x + w / 2 - 3, y + h / 2 - 1.5, 6, 3, HAZ)
+  }
+  crate(326, HZ - 22, 24, 22)
+  crate(352, HZ - 16, 18, 16)
+  crate(331, HZ - 40, 17, 18)
+  for (let k = 0; k < 10; k++) rect(362 - k * 0.45, HZ + 4 - k, 3 + k * 0.9, 1, k % 4 < 2 ? hex('#e98a3f') : hex('#fff7ef'))
+  rect(359, HZ + 4, 10, 1.5, K)
+
   // Spotlights: fixtures, dithered volumetric cones, floor pools
   // The pod light stops at the pod roof (its glass lights the suit from inside instead)
-  for (const [sx, spread, coneEnd] of [[82 + DX, 40, GH], [215 + DX, 34, GH], [25, 22, 14]] as const) {
+  for (const [sx, spread, coneEnd] of [[82 + DX, 40, GH], [215 + DX, 34, GH], [25, 22, 14], [-32, 26, GH], [348, 26, GH]] as const) {
     area(sx - spread - 6, 7, sx + spread + 6, coneEnd, (fx, fy, lx, ly) => {
       const t = (ly - 7) / (GH - 7)
       const half = 5 + t * spread

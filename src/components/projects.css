@@ -1,0 +1,71 @@
+/* ---------- Project cards: texture + pixel motion (no dot patterns) ---------- */
+
+/* Card body: warm paper tone instead of flat white */
+.card-body {
+  background: linear-gradient(180deg, #fffaf1 0%, #fdf0dc 100%);
+}
+.dark .card-body {
+  background: linear-gradient(180deg, #251513 0%, #1b0f0d 100%);
+}
+
+/* Faint line grid, strongest at the bottom-right and fading up/left */
+.card-grid {
+  background-image:
+    linear-gradient(rgb(190 26 26 / 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(190 26 26 / 0.07) 1px, transparent 1px);
+  background-size: 16px 16px;
+  mask-image: radial-gradient(120% 100% at 100% 100%, #000 10%, transparent 70%);
+}
+.dark .card-grid {
+  background-image:
+    linear-gradient(rgb(248 235 171 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(248 235 171 / 0.06) 1px, transparent 1px);
+}
+
+/* Hover: pixels rise out of the bottom of the card */
+.card-rise span {
+  opacity: 0;
+  animation: card-rise 1.5s steps(10) infinite;
+  animation-play-state: paused;
+}
+.group:hover .card-rise span,
+.group:focus-within .card-rise span {
+  animation-play-state: running;
+}
+@keyframes card-rise {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-150px); opacity: 0; }
+}
+
+/* Section backdrop: pixel rain — short trails of squares falling in columns */
+.pixel-rain span {
+  position: absolute;
+  top: -80px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: pixel-fall linear infinite;
+  will-change: transform;
+}
+.pixel-rain {
+  container-type: size;
+}
+@keyframes pixel-fall {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(100cqh + 80px)); }
+}
+
+/* npm card: pixels drifting up through the card, always on */
+.npm-rise span {
+  position: absolute;
+  bottom: -12px;
+  opacity: 0;
+  animation: npm-rise linear infinite;
+}
+@keyframes npm-rise {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.7; }
+  85% { opacity: 0.35; }
+  100% { transform: translateY(-420px); opacity: 0; }
+}
