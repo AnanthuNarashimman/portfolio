@@ -234,29 +234,32 @@
   100% { transform: translateY(-420px); opacity: 0; }
 }
 
-/* ---------- Heading mosaic tiles (light: yellow → peach → pink; dark: ember reds) ---------- */
-.m-r0 { fill: #ffd86b; }
-.m-r1 { fill: #ffcd70; }
-.m-r2 { fill: #ffc176; }
-.m-r3 { fill: #ffb57c; }
-.m-r4 { fill: #ffaa82; }
-.m-r5 { fill: #ffa088; }
-.m-r6 { fill: #ff978c; }
-.m-r7 { fill: #ff8f8e; }
-.m-a0 { fill: #ff8a1f; }
-.m-a1 { fill: #f25546; }
-.m-a2 { fill: #ffbf00; }
-.dark .m-r0 { fill: #8a5a18; }
-.dark .m-r1 { fill: #87521a; }
-.dark .m-r2 { fill: #844a1c; }
-.dark .m-r3 { fill: #81421e; }
-.dark .m-r4 { fill: #7e3b20; }
-.dark .m-r5 { fill: #7b3422; }
-.dark .m-r6 { fill: #782e24; }
-.dark .m-r7 { fill: #752826; }
-.dark .m-a0 { fill: #d0701c; }
-.dark .m-a1 { fill: #c9382c; }
-.dark .m-a2 { fill: #d9a21a; }
+/* ---------- Heading mosaic tiles, on the theme palette ----------
+   Light: cream (#f8ebab) → gold (#f7d87f) → orange (#e98a3f) → toward vermilion (#dc4a28);
+   accents vermilion, crimson (#be1a1a) and a cream sparkle.
+   Dark: the same ramp dimmed into the ember reds (#4a0b0b / #8f1414). */
+.m-r0 { fill: #f8ebab; }
+.m-r1 { fill: #f7e196; }
+.m-r2 { fill: #f7d87f; }
+.m-r3 { fill: #f2c26a; }
+.m-r4 { fill: #eeab56; }
+.m-r5 { fill: #e98a3f; }
+.m-r6 { fill: #e37638; }
+.m-r7 { fill: #dc6230; }
+.m-a0 { fill: #dc4a28; }
+.m-a1 { fill: #be1a1a; }
+.m-a2 { fill: #fff7ef; }
+.dark .m-r0 { fill: #77591e; }
+.dark .m-r1 { fill: #784d1c; }
+.dark .m-r2 { fill: #78421b; }
+.dark .m-r3 { fill: #79381a; }
+.dark .m-r4 { fill: #7a2f19; }
+.dark .m-r5 { fill: #7b2718; }
+.dark .m-r6 { fill: #731f16; }
+.dark .m-r7 { fill: #6a1814; }
+.dark .m-a0 { fill: #d0741f; }
+.dark .m-a1 { fill: #d0311e; }
+.dark .m-a2 { fill: #e0b54a; }
 .mosaic-twinkle {
   opacity: 0;
   animation: mosaic-twinkle ease-in-out infinite;

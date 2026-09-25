@@ -511,16 +511,26 @@ export default function Breather() {
       <div className="mx-auto w-full max-w-7xl px-8">
         {/* Centred heading on a small pixel-tile plate that hugs the text */}
         <div className="text-center">
-          <div className="pixel-corners relative isolate inline-block overflow-hidden px-7 py-3.5" style={vars({ '--px': '6px' })}>
-            <TextMosaic />
-            <div aria-hidden="true" className="absolute inset-0 bg-white/20 dark:bg-night/30" />
-            <h2 className="relative font-display text-3xl leading-tight font-semibold tracking-[-0.03em] text-ink dark:text-accent-50">
-              Break it. Figure it out. Ship it{' '}
-              <span className="relative ml-1 inline-block">
-                <span aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-1 translate-y-1 bg-accent-900/70" />
-                <span className="pixel-corners relative inline-block bg-accent-300 px-2.5 pb-0.5 text-accent-800">anyway.</span>
-              </span>
-            </h2>
+          {/* Framed like the project cards: hard offset shadow, crimson pixel border, solid gaps between tiles */}
+          <div className="relative inline-block">
+            <div
+              aria-hidden="true"
+              className="pixel-corners absolute inset-0 translate-x-1.5 translate-y-1.5 bg-accent-900/35 dark:bg-black/60"
+              style={vars({ '--px': '6px' })}
+            />
+            <div className="pixel-corners relative bg-accent-600 p-[2px] dark:bg-accent-400/70" style={vars({ '--px': '6px' })}>
+              <div className="pixel-corners relative isolate overflow-hidden bg-[#fff7ef] px-7 py-3.5 dark:bg-night" style={vars({ '--px': '6px' })}>
+                <TextMosaic />
+                <div aria-hidden="true" className="absolute inset-0 bg-white/15 dark:bg-transparent" />
+                <h2 className="relative font-display text-3xl leading-tight font-semibold tracking-[-0.03em] text-ink dark:text-accent-50">
+                  Break it. Figure it out. Ship it{' '}
+                  <span className="relative ml-1 inline-block">
+                    <span aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-1 translate-y-1 bg-accent-900/70" />
+                    <span className="pixel-corners relative inline-block bg-accent-300 px-2.5 pb-0.5 text-accent-800">anyway.</span>
+                  </span>
+                </h2>
+              </div>
+            </div>
           </div>
         </div>
 
