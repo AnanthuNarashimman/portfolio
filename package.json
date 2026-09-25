@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/geist-mono": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "lucide-react": "^1.48.0",
     "motion": "^13.4.3",

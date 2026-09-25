@@ -1,18 +1,18 @@
 export const profile = {
   firstName: 'Ananthu',
   lastName: 'Narashimman',
-  role: 'SDE Intern @ Stealth Startup',
-  headline: 'Building solutions that',
-  headlineAccent: 'matter.',
+  headline: 'Shipping AI systems people actually',
+  headlineAccent: 'use.',
   summary:
-    'I build agentic AI systems, developer tools, and full-stack products — from idea to deployed in days. Always at a hackathon,',
-  summaryAccent: 'always shipping.',
+    "I'm an AI engineer who likes building and figuring things out along the way. I've built an assessment platform used by 100+ students, shipped AI agents and backend systems, and released npm packages with 1,000+ downloads. I build across the stack and rarely know what I'll build next.",
   email: 'ananthu.narashimman@gmail.com',
   socials: {
     github: 'https://github.com/AnanthuNarashimman',
     linkedin: 'https://www.linkedin.com/in/ananthunarashimman',
     x: 'https://x.com/AnanthuN7652',
   },
+  // TODO: no longer shown in the hero — move these numbers onto the relevant project cards
+  // (npm downloads → tracetel / agent-smith, users served → VibeAudit / AlgoFlow, etc.)
   stats: [
     { value: '1k+', label: 'npm downloads' },
     { value: '500+', label: 'users served' },

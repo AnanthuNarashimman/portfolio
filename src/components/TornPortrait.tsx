@@ -1,4 +1,5 @@
-import { motion } from 'motion/react'
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react'
+import { useEffect, useState, type PointerEvent, type ReactNode } from 'react'
 import portrait from '../assets/portrait.webp'
 import { profile } from '../data/profile'
 
@@ -7,9 +8,15 @@ import { profile } from '../data/profile'
  * Everything is drawn in the illustration's own pixel space (1254×1254) so the
  * hole lines up with the shoulders: the head sits in front of the torn edge,
  * the torso disappears behind the paper below it.
+ *
+ * Performance: every ragged edge is computed once in JS (no displacement filters),
+ * the portrait is clipped with a plain vector clipPath, and the few blur filters
+ * live in layers that only ever move as a whole. So animation never re-runs a
+ * filter — it stays smooth even on laptops rendering without a GPU.
  */
 
 const IMG = 1254
+const VIEWBOX = '95 20 1180 1230'
 const CX = 665
 const CY = 950
 const RX = 560
@@ -17,6 +24,11 @@ const RY = 280 // top half
 const RY_BOTTOM = 210 // shallower bottom half so the tear stays above the shirt hem
 const SQUARENESS = 3.2 // superellipse exponent: flatter top so the ears stay inside the hole
 const HEAD_CUT = 700 // everything above this line is in front of the paper
+const TAU = Math.PI * 2
+
+type Pt = [number, number]
+const fmt = ([x, y]: Pt) => `${x.toFixed(1)},${y.toFixed(1)}`
+const rad = (d: number) => (d * Math.PI) / 180
 
 function rng(seed: number) {
   return () => {
@@ -27,8 +39,19 @@ function rng(seed: number) {
   }
 }
 
+// Smooth random function around the circle (period 2π), values in -1…1
+function loopNoise(rand: () => number, freq: number) {
+  const v = Array.from({ length: freq }, () => rand() * 2 - 1)
+  return (t: number) => {
+    const x = (((t % TAU) + TAU) % TAU) / TAU * freq
+    const i = Math.floor(x)
+    const s = (1 - Math.cos(Math.PI * (x - i))) / 2
+    return v[i % freq] + (v[(i + 1) % freq] - v[i % freq]) * s
+  }
+}
+
 // Point on the hole's superellipse outline at angle t, scaled by s
-function edgePoint(t: number, s = 1): [number, number] {
+function edgePoint(t: number, s = 1): Pt {
   const c = Math.cos(t)
   const n = Math.sin(t)
   const e = 2 / SQUARENESS
@@ -36,181 +59,312 @@ function edgePoint(t: number, s = 1): [number, number] {
   return [CX + RX * s * Math.sign(c) * Math.abs(c) ** e, CY + ry * s * Math.sign(n) * Math.abs(n) ** e]
 }
 
-// Ragged closed outline: slow wobble plus sharp paper-fibre teeth
-function tornOutline(seed: number, scale: number, teeth: number) {
-  const rand = rng(seed)
-  const phases = [rand() * 6.28, rand() * 6.28, rand() * 6.28]
-  const steps = 150
-  const pts: string[] = []
-  for (let i = 0; i < steps; i++) {
-    const t = (i / steps) * Math.PI * 2
-    const wobble = 0.025 * Math.sin(3 * t + phases[0]) + 0.018 * Math.sin(5 * t + phases[1]) + 0.012 * Math.sin(9 * t + phases[2])
-    const tooth = (i % 2 ? 1 : -0.4) * teeth * rand()
-    const [x, y] = edgePoint(t, scale * (1 + wobble + tooth))
-    pts.push(`${x.toFixed(1)},${y.toFixed(1)}`)
+/* ---------- The hole: layered noise + a few abrupt tongues, like real torn card ---------- */
+
+const edgeRand = rng(7)
+const octaves = [
+  [5, 0.026],
+  [13, 0.015],
+  [29, 0.008],
+  [71, 0.004],
+].map(([f, a]) => [loopNoise(edgeRand, f), a] as const)
+const tongues = Array.from({ length: 11 }, () => ({
+  at: edgeRand() * TAU,
+  width: 0.015 + edgeRand() * 0.05,
+  amp: (edgeRand() - 0.45) * 0.08,
+}))
+const angleDist = (a: number, b: number) => Math.abs(((((a - b + Math.PI) % TAU) + TAU) % TAU) - Math.PI)
+
+function holeScale(t: number) {
+  let s = 1
+  for (const [n, a] of octaves) s += n(t) * a
+  for (const { at, width, amp } of tongues) s += amp * Math.max(0, 1 - angleDist(t, at) / width)
+  return s
+}
+
+/* ---------- The peeled lip: the whole edge rolls back as one piece, swelling into flaps ---------- */
+
+/*
+ * Flaps are where the card split further and peeled back more. They grow out of the lip, so there are
+ * no hard ends: [angle°, reach px, spread left°, spread right°] — 0 = right, 90 = bottom. Spread
+ * around the sides and bottom (the top is behind the head); each gets a seeded random nudge so none
+ * are alike, and the lopsided spreads keep any flap from being symmetric.
+ */
+const flapRand = rng(99)
+const FLAPS = (
+  [
+    [-38, 42, 7, 5],
+    [4, 104, 9, 14],
+    [47, 62, 11, 6],
+    [83, 86, 6, 10],
+    [100, 40, 4, 6],
+    [142, 46, 15, 11],
+    [184, 112, 10, 13],
+    [215, 46, 6, 9],
+  ] as const
+).map(([a, reach, wl, wr]) => ({
+  at: rad(a + (flapRand() - 0.5) * 8),
+  reach: reach * (0.82 + flapRand() * 0.36),
+  left: rad(wl * (0.8 + flapRand() * 0.45)),
+  right: rad(wr * (0.8 + flapRand() * 0.45)),
+}))
+
+const lipNoise = loopNoise(edgeRand, 23)
+const bandA = loopNoise(edgeRand, 17)
+const bandB = loopNoise(edgeRand, 53)
+
+// Lip width (px beyond the hole): a thin wavering roll everywhere, plus the flaps. Pointed tips, concave sides.
+function lipWidth(t: number) {
+  let w = 6 + 9 * (0.5 + 0.5 * lipNoise(t))
+  for (const { at, reach, left, right } of FLAPS) {
+    const d = (((t - at + Math.PI) % TAU) + TAU) % TAU - Math.PI
+    const x = Math.abs(d) / (d < 0 ? left : right)
+    if (x < 1) w += reach * (1 - x) ** 1.6
   }
-  return `M${pts.join('L')}Z`
+  return w
 }
+// White paper core exposed along the torn outer edge — uneven, like real torn card
+const coreWidth = (t: number) => 3 + 9 * Math.max(0, bandA(t)) ** 1.3 + 3 * (0.5 + 0.5 * bandB(t))
 
-const HOLE = tornOutline(7, 1, 0.012)
-const RIM = tornOutline(19, 1.045, 0.022)
-
-// Paper flaps peeling outward from the tear: [start angle, end angle, reach, twist] in degrees
-const FLAPS: [number, number, number, number][] = [
-  [196, 214, 1.34, 10],
-  [140, 158, 1.3, -8],
-  [100, 116, 1.24, 6],
-  [52, 68, 1.3, -10],
-  [-4, 12, 1.33, 8],
-  [-36, -24, 1.26, -6],
-]
-
-function flapPath([a0, a1, reach, twist]: (typeof FLAPS)[number]) {
-  const r = (d: number) => (d * Math.PI) / 180
-  const [x0, y0] = edgePoint(r(a0), 1.03)
-  const [x1, y1] = edgePoint(r(a1), 1.03)
-  const [tx, ty] = edgePoint(r((a0 + a1) / 2 + twist), reach)
-  const [mx0, my0] = edgePoint(r(a0 + (a1 - a0) * 0.2 + twist * 0.6), (1 + reach) / 2 + 0.03)
-  const [mx1, my1] = edgePoint(r(a1 - (a1 - a0) * 0.25 + twist * 0.6), (1 + reach) / 2 - 0.02)
-  return `M${x0},${y0}L${mx0},${my0}L${tx},${ty}L${mx1},${my1}L${x1},${y1}Z`
-}
-
-// Loose scraps of paper flying off the tear: [x, y, size, rotation, drift delay]
-const SCRAPS: [number, number, number, number, number][] = [
-  [175, 470, 46, -18, 0],
-  [1185, 520, 38, 24, 1.2],
-  [125, 1130, 30, 40, 0.6],
-  [1245, 1110, 40, -30, 1.8],
-]
-
-function scrapPath(size: number, seed: number) {
-  const rand = rng(seed)
-  const pts = Array.from({ length: 7 }, (_, i) => {
-    const t = (i / 7) * Math.PI * 2
-    const r = size * (0.55 + rand() * 0.5)
-    return `${(Math.cos(t) * r).toFixed(1)},${(Math.sin(t) * r * 0.75).toFixed(1)}`
+const STEPS = 900
+const EDGE = (() => {
+  const rand = rng(11)
+  return Array.from({ length: STEPS }, (_, i) => {
+    const t = (i / STEPS) * TAU
+    const p = edgePoint(t, holeScale(t))
+    // outward normal from the neighbouring points
+    const a = edgePoint(t - 0.004, holeScale(t - 0.004))
+    const b = edgePoint(t + 0.004, holeScale(t + 0.004))
+    let [nx, ny] = [b[1] - a[1], -(b[0] - a[0])]
+    const l = Math.hypot(nx, ny) || 1
+    ;[nx, ny] = [nx / l, ny / l]
+    if (nx * (p[0] - CX) + ny * (p[1] - CY) < 0) [nx, ny] = [-nx, -ny]
+    const lip = lipWidth(t) + (rand() - 0.5) * 3 // fibres
+    const core = lip + coreWidth(t) + (rand() - 0.5) * 3.5
+    const j = (rand() - 0.5) * 2.5
+    return {
+      hole: [p[0] + nx * j, p[1] + ny * j] as Pt,
+      lip: [p[0] + nx * lip, p[1] + ny * lip] as Pt,
+      core: [p[0] + nx * core, p[1] + ny * core] as Pt,
+    }
   })
-  return `M${pts.join('L')}Z`
-}
+})()
+const closed = (pts: Pt[]) => `M${pts.map(fmt).join('L')}Z`
+
+const HOLE = closed(EDGE.map((e) => e.hole))
+const LIP = closed(EDGE.map((e) => e.lip))
+const CORE = closed(EDGE.map((e) => e.core))
+// Half-resolution outline for clipping the portrait — it's re-clipped every hover frame, so fewer points = cheaper
+const HOLE_CLIP = closed(EDGE.filter((_, i) => i % 2 === 0).map((e) => e.hole))
 
 // Hand-drawn four-point sparkle
 const SPARKLE = 'M0,-40 C4,-10 10,-4 40,0 C10,4 4,10 0,40 C-4,10 -10,4 -40,0 C-10,-4 -4,-10 0,-40Z'
+const SPARKLES = [
+  [1150, 250, 0.9],
+  [255, 300, 0.55],
+  [1235, 800, 0.5],
+]
 
 const pop = { type: 'spring', stiffness: 120, damping: 14 } as const
 
-export default function TornPortrait() {
+// Shared SVG definitions referenced by every layer
+function Defs() {
   return (
-    <div className="relative mx-auto aspect-[1180/1230] w-full max-w-md lg:mr-0 lg:w-[min(100%,calc(min(76dvh,700px)*0.959))] lg:max-w-none">
-      <svg
-        viewBox="95 20 1180 1230"
-        className="absolute inset-0 size-full overflow-visible"
-        role="img"
-        aria-label={`Illustration of ${profile.firstName} bursting through the page`}
-      >
-        <defs>
-          <clipPath id="hole-clip">
-            <path d={HOLE} />
-          </clipPath>
-          <mask id="burst-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={IMG} height={IMG}>
-            <rect x="0" y="0" width={IMG} height={HEAD_CUT} fill="#fff" />
-            <path d={HOLE} fill="#fff" />
-          </mask>
-          <radialGradient id="paper" cx="50%" cy="60%" r="65%">
-            <stop offset="0%" stopColor="#fffdf6" />
-            <stop offset="70%" stopColor="#fdf7ec" />
-            <stop offset="100%" stopColor="#f4e6d2" />
-          </radialGradient>
-          <linearGradient id="flap" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#fff4ec" />
-            <stop offset="60%" stopColor="#f9dccf" />
-            <stop offset="100%" stopColor="#eab8a6" />
-          </linearGradient>
-          <filter id="grain" x="0" y="0" width="100%" height="100%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" />
-            <feColorMatrix values="0 0 0 0 0.45  0 0 0 0 0.25  0 0 0 0 0.15  0 0 0 0.05 0" />
-            <feComposite in2="SourceGraphic" operator="in" />
-          </filter>
-          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="14" />
-          </filter>
-          <filter id="lift" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="22" stdDeviation="18" floodColor="#4a0b0b" floodOpacity="0.45" />
-          </filter>
-          <filter id="flap-shadow" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="6" dy="10" stdDeviation="8" floodColor="#4a0b0b" floodOpacity="0.4" />
-          </filter>
-        </defs>
+    <svg aria-hidden="true" width="0" height="0" className="absolute">
+      <defs>
+        <clipPath id="lip-clip">
+          <path d={LIP} />
+        </clipPath>
+        <clipPath id="hole-clip">
+          <path d={HOLE} />
+        </clipPath>
+        {/* Head in front of the paper (above HEAD_CUT) + body visible only through the hole */}
+        <clipPath id="burst-clip">
+          <rect x="-200" y="-200" width="1700" height={HEAD_CUT + 200} />
+          <path d={HOLE_CLIP} />
+        </clipPath>
+        <radialGradient id="paper" gradientUnits="userSpaceOnUse" cx={CX} cy={CY + 40} r="620">
+          <stop offset="0%" stopColor="#fffdf7" />
+          <stop offset="65%" stopColor="#fbf4e7" />
+          <stop offset="100%" stopColor="#efe0ca" />
+        </radialGradient>
+      </defs>
+    </svg>
+  )
+}
 
-        {/* The tear opens up */}
-        <motion.g
-          initial={{ scale: 0.2, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ ...pop, delay: 0.3 }}
-          style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-        >
-          {/* Shadow the torn edge casts on the card */}
-          <path d={RIM} fill="#4a0b0b" opacity="0.35" filter="url(#soft)" transform="translate(0 16)" />
-          {/* White paper fibres along the torn edge */}
-          <path d={RIM} fill="#fff6ee" />
-          {/* The paper behind */}
-          <path d={HOLE} fill="url(#paper)" />
-          <path d={HOLE} fill="#fff" filter="url(#grain)" />
-          {/* Inner shadow so the hole reads as depth */}
-          <g clipPath="url(#hole-clip)">
-            <path d={HOLE} fill="none" stroke="#7a1616" strokeOpacity="0.35" strokeWidth="70" filter="url(#soft)" />
-          </g>
+// Frame around the hole, used for the inner shadow (hole cut out with even-odd fill)
+const INNER_FRAME = `M${CX - RX - 90},${CY - RY - 90}H${CX + RX + 90}V${CY + RY_BOTTOM + 90}H${CX - RX - 90}Z ${HOLE}`
 
-          {/* Curled flaps peeling back */}
-          {FLAPS.map((f, i) => (
-            <path key={i} d={flapPath(f)} fill="url(#flap)" stroke="#fff6ee" strokeWidth="3" filter="url(#flap-shadow)" />
-          ))}
-        </motion.g>
+/*
+ * Soft shadow without a blur filter: a few translucent copies of the shape, each nudged a bit
+ * further along (dx, dy). Overlaps build a darker core and a feathered edge, and plain fills
+ * cost almost nothing to paint — unlike feGaussianBlur on a CPU-only laptop.
+ */
+function SoftShadow({ d, dx, dy, opacity, color, evenOdd }: { d: string; dx: number; dy: number; opacity: number; color: string; evenOdd?: boolean }) {
+  const steps = 5
+  return (
+    <g fill={color} fillRule={evenOdd ? 'evenodd' : undefined} opacity={opacity}>
+      {Array.from({ length: steps }, (_, i) => {
+        const k = (i + 1) / steps
+        return <path key={i} d={d} opacity={1 / steps + 0.08} transform={`translate(${(dx * k).toFixed(1)} ${(dy * k).toFixed(1)})`} />
+      })}
+    </g>
+  )
+}
 
-        {/* The portrait pushing through */}
-        <motion.g
-          initial={{ y: 140, scale: 0.86, opacity: 0 }}
-          animate={{ y: 0, scale: 1, opacity: 1 }}
-          transition={{ ...pop, delay: 0.55 }}
-          style={{ transformBox: 'fill-box', transformOrigin: '50% 100%' }}
-        >
-          <g filter="url(#lift)">
-            <image href={portrait} x="0" y="0" width={IMG} height={IMG} mask="url(#burst-mask)" />
-          </g>
-        </motion.g>
+const SCENE_IMAGES = [portrait]
 
-        {/* Scraps of paper flying off */}
-        {SCRAPS.map(([x, y, size, rot, delay], i) => (
-          <motion.g
-            key={i}
-            initial={{ opacity: 0, x: CX - x, y: CY - y, scale: 0.3 }}
-            animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-            transition={{ ...pop, delay: 0.5 + i * 0.06 }}
-          >
-            <g transform={`translate(${x} ${y}) rotate(${rot})`}>
-              <g className="animate-float" style={{ animationDelay: `${-delay}s` }}>
-                <path d={scrapPath(size, 40 + i)} fill={i % 2 ? '#f8ebab' : '#fff6ee'} filter="url(#flap-shadow)" />
-              </g>
-            </g>
-          </motion.g>
-        ))}
+/*
+ * Resolves once the scene's images are decoded and the page has painted twice. The entrance waits
+ * for this, so on a slow laptop the animation plays from its first frame instead of starting while
+ * the page is still loading and skipping ahead in visible jumps.
+ */
+function useSceneReady() {
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    const decodes = SCENE_IMAGES.map((src) => {
+      const img = new Image()
+      img.src = src
+      return img.decode().catch(() => {})
+    })
+    Promise.all(decodes).then(() =>
+      requestAnimationFrame(() => requestAnimationFrame(() => !cancelled && setReady(true))),
+    )
+    return () => {
+      cancelled = true
+    }
+  }, [])
+  return ready
+}
 
-        {/* Gold sparkles */}
-        {[
-          [1150, 250, 0.9],
-          [255, 300, 0.55],
-          [1235, 800, 0.5],
-        ].map(([x, y, s], i) => (
-          <motion.path
-            key={i}
-            d={SPARKLE}
-            fill="#f7d87f"
-            initial={{ scale: 0, rotate: -45 }}
-            animate={{ scale: s, rotate: 0 }}
-            transition={{ ...pop, delay: 1 + i * 0.15 }}
-            style={{ x, y }}
-          />
-        ))}
+type LayerProps = {
+  x: MotionValue<number>
+  y: MotionValue<number>
+  children: ReactNode
+  initial?: { opacity?: number; scale?: number }
+  play?: boolean
+  delay?: number
+}
+
+// One stacked scene layer. It only ever moves/fades as a whole (a cheap transform), so its content is painted once.
+function Layer({ x, y, children, initial, play = true, delay = 0 }: LayerProps) {
+  return (
+    <motion.div
+      className="pointer-events-none absolute inset-0 will-change-transform"
+      style={{ x, y }}
+      initial={initial}
+      animate={initial && play ? { opacity: 1, scale: 1 } : undefined}
+      transition={{ ...pop, delay, opacity: { duration: 0.35, delay } }}
+    >
+      <svg viewBox={VIEWBOX} className="absolute inset-0 size-full overflow-visible">
+        {children}
       </svg>
+    </motion.div>
+  )
+}
+
+export default function TornPortrait() {
+  const reduceMotion = useReducedMotion()
+  const play = useSceneReady()
+
+  // Pointer position over the portrait, -0.5 … 0.5 on each axis, eased with a spring
+  const px = useMotionValue(0)
+  const py = useMotionValue(0)
+  const spring = { stiffness: 140, damping: 18, mass: 0.6 }
+  const sx = useSpring(px, spring)
+  const sy = useSpring(py, spring)
+  const hover = useSpring(0, spring)
+
+  // Whole scene tilts toward the cursor…
+  const rotateY = useTransform(sx, [-0.5, 0.5], [-7, 7])
+  const rotateX = useTransform(sy, [-0.5, 0.5], [6, -6])
+  // …and each layer shifts by its depth (CSS px), so nearer things move further
+  const tearX = useTransform(sx, (v) => v * 8)
+  const tearY = useTransform(sy, (v) => v * 6)
+  // Portrait shifts *inside* the fixed clip (SVG user units), so the torn edge keeps clipping the body
+  const headX = useTransform(sx, (v) => v * 44)
+  const headY = useTransform([sy, hover], ([y, h]: number[]) => y * 26 - h * 16)
+  const headTurn = useTransform(sx, (v) => v * 4)
+  const sparkX = useTransform(sx, (v) => v * -30)
+  const sparkY = useTransform(sy, (v) => v * -24)
+
+  function onPointerMove(e: PointerEvent<HTMLDivElement>) {
+    if (reduceMotion || e.pointerType !== 'mouse') return
+    const r = e.currentTarget.getBoundingClientRect()
+    px.set((e.clientX - r.left) / r.width - 0.5)
+    py.set((e.clientY - r.top) / r.height - 0.5)
+    hover.set(1)
+  }
+  function onPointerLeave() {
+    px.set(0)
+    py.set(0)
+    hover.set(0)
+  }
+
+  return (
+    <div
+      onPointerMove={onPointerMove}
+      onPointerLeave={onPointerLeave}
+      className="relative mx-auto aspect-[1180/1230] w-full max-w-md lg:mr-0 lg:w-[min(100%,calc(min(76dvh,700px)*0.959))] lg:max-w-none"
+      role="img"
+      aria-label={`Illustration of ${profile.firstName} bursting through the page`}
+    >
+      <Defs />
+      <motion.div className="absolute inset-0" style={{ rotateX, rotateY, transformPerspective: 1100 }}>
+        {/* The tear in the card — pops open as one pre-painted layer */}
+        <Layer x={tearX} y={tearY} initial={{ opacity: 0, scale: 0.55 }} play={play} delay={0.05}>
+          {/* Shadow the lifted, peeled edge casts on the card */}
+          <SoftShadow d={CORE} dx={3} dy={14} opacity={0.38} color="#3a0808" />
+          {/* Torn outer edge: uneven white paper core, thin dark line where the red face breaks */}
+          <path d={CORE} fill="#fff7ef" stroke="#8f1414" strokeOpacity="0.4" strokeWidth="3.5" strokeLinejoin="round" />
+          {/* The peeled-back lip: the card's pale underside, shaded like it rolls over at the fold */}
+          <path d={LIP} fill="#f3d5ca" />
+          <g clipPath="url(#lip-clip)" fill="none">
+            <path d={LIP} stroke="#b9786a" strokeOpacity="0.35" strokeWidth="7" />
+            <path d={HOLE} stroke="#fff6f1" strokeOpacity="0.75" strokeWidth="44" />
+            <path d={HOLE} stroke="#a4544a" strokeOpacity="0.35" strokeWidth="20" />
+            <path d={HOLE} stroke="#7a2a22" strokeOpacity="0.4" strokeWidth="9" />
+          </g>
+          {/* The paper behind the card */}
+          <g clipPath="url(#hole-clip)">
+            <rect x="0" y="560" width={IMG + 100} height="720" fill="url(#paper)" />
+            {/* Inner shadow: the card's cut edge overhangs the paper, darkest along the top */}
+            <SoftShadow d={INNER_FRAME} dx={0} dy={26} opacity={0.5} color="#3a0808" evenOdd />
+          </g>
+        </Layer>
+
+        {/* The portrait: rises through the hole, then leans and lifts toward the cursor — no filters, just an image in a vector clip */}
+        <Layer x={tearX} y={tearY}>
+          <g clipPath="url(#burst-clip)">
+            <motion.g style={{ x: headX, y: headY, rotate: headTurn, transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
+              <motion.g
+                initial={{ y: 160, opacity: 0 }}
+                animate={play ? { y: 0, opacity: 1 } : undefined}
+                transition={{ ...pop, delay: 0.25, opacity: { duration: 0.25, delay: 0.25 } }}
+              >
+                <image href={portrait} x="0" y="0" width={IMG} height={IMG} />
+              </motion.g>
+            </motion.g>
+          </g>
+        </Layer>
+
+        {/* Gold sparkles drift the other way for depth */}
+        <Layer x={sparkX} y={sparkY}>
+          {SPARKLES.map(([x, y, s], i) => (
+            <motion.path
+              key={i}
+              d={SPARKLE}
+              fill="#f7d87f"
+              initial={{ scale: 0, rotate: -45 }}
+              animate={play ? { scale: s, rotate: 0 } : undefined}
+              transition={{ ...pop, delay: 0.7 + i * 0.15 }}
+              style={{ x, y }}
+            />
+          ))}
+        </Layer>
+      </motion.div>
     </div>
   )
 }
