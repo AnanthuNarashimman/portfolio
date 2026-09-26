@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 import NpmPackages from '../components/NpmPackages'
 import { PixelDivider, PixelRain, ProjectCard } from '../components/Projects'
 import ThemeToggle from '../components/ThemeToggle'
+import { siteTitle } from '../data/profile'
 import { categories, projects, type Category } from '../data/projects'
 
 const px = (n: number) => ({ '--px': `${n}px` }) as CSSProperties
@@ -20,7 +21,7 @@ export default function AllProjects() {
     window.scrollTo(0, 0)
     document.title = 'All projects · Ananthu Narashimman'
     return () => {
-      document.title = 'Ananthu Narashimman — Agentic AI, Developer Tools, Full-Stack'
+      document.title = siteTitle
     }
   }, [])
 

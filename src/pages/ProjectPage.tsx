@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router'
 import { GithubIcon } from '../components/SocialIcons'
 import ThemeToggle from '../components/ThemeToggle'
+import { siteTitle } from '../data/profile'
 import { projects } from '../data/projects'
 
 /*
@@ -65,9 +66,9 @@ export default function ProjectPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    if (project) document.title = `${project.title} — how it works · Ananthu Narashimman`
+    if (project) document.title = `${project.title}: how it works · Ananthu Narashimman`
     return () => {
-      document.title = 'Ananthu Narashimman — Agentic AI, Developer Tools, Full-Stack'
+      document.title = siteTitle
     }
   }, [project])
 

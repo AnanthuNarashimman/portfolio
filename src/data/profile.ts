@@ -20,4 +20,7 @@ export const profile = {
   ],
 }
 
+// Default page title (index.html has the same one for the first paint)
+export const siteTitle = 'Ananthu Narashimman | Agentic AI, Developer Tools, Full-Stack'
+
 export const navLinks = ['Build Log', 'Projects', 'Tech Stack', 'Journey', 'Contact']
