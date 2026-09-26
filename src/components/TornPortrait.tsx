@@ -1,6 +1,7 @@
 import { m, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react'
 import { useEffect, useState, type PointerEvent, type ReactNode } from 'react'
 import portrait from '../assets/portrait.webp'
+import { useIntroDone } from '../lib/intro'
 import { profile } from '../data/profile'
 
 /*
@@ -267,7 +268,10 @@ function Layer({ x, y, children, initial, play = true, delay = 0 }: LayerProps) 
 
 export default function TornPortrait() {
   const reduceMotion = useReducedMotion()
-  const play = useSceneReady()
+  // Bursts through once its image is decoded and (on a first visit) the opening animation has cleared
+  const introDone = useIntroDone()
+  const sceneReady = useSceneReady()
+  const play = sceneReady && introDone
 
   // Pointer position over the portrait, -0.5 … 0.5 on each axis, eased with a spring
   const px = useMotionValue(0)

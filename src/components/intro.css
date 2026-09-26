@@ -1,0 +1,107 @@
+/* Opening animation (see Intro.tsx; the static cover itself is styled inline in index.html) */
+
+/* Once React has drawn the block grid on top, the static cover goes transparent underneath it */
+#intro.is-live {
+  background: transparent;
+}
+
+/* Blocks: each one shrinks away with its own delay (centre first). They're promoted to GPU layers
+   up front (will-change) so the exit never stalls creating them, and drawn 2% oversize so no hairline
+   seams show between neighbours at fractional sizes (cheaper than a box-shadow per block). */
+.intro-blocks span {
+  background: #be1a1a;
+  transform: scale(1.02);
+  will-change: transform;
+}
+.intro-blocks::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(248 235 171 / 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(248 235 171 / 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 65% at 50% 50%, #000 20%, transparent 80%);
+  z-index: 1;
+}
+.intro-blocks.is-leaving::before {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+.intro-blocks.is-leaving span {
+  animation: intro-block 380ms cubic-bezier(0.55, 0, 0.3, 1) var(--d) both;
+}
+@keyframes intro-block {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(0);
+  }
+}
+
+/* Name: letters rise in one after another */
+.intro-letter {
+  animation: intro-rise 520ms cubic-bezier(0.22, 1.3, 0.36, 1) calc(120ms + var(--i) * 60ms) both;
+}
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+}
+
+/* Pixel me pops up beside the name */
+.intro-me {
+  image-rendering: pixelated;
+  animation: intro-pop 500ms cubic-bezier(0.22, 1.4, 0.36, 1) 60ms both;
+  transform-origin: bottom center;
+}
+@keyframes intro-pop {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.85);
+  }
+}
+
+/* Loading bar: pixels light up left to right. A gold layer fades in over each dim slot: opacity runs
+   on the GPU, where animating the background colour would repaint on the main thread */
+.intro-bar {
+  position: relative;
+  background: rgb(255 247 239 / 0.14);
+}
+.intro-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #f7d87f;
+  opacity: 0;
+  animation: intro-bar 90ms ease-out calc(260ms + var(--i) * 32ms) forwards;
+}
+@keyframes intro-bar {
+  to {
+    opacity: 1;
+  }
+}
+
+.intro-label {
+  animation: intro-fade 400ms ease-out 300ms both;
+}
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The name and bar lift and fade just before the blocks go */
+.intro-stage {
+  z-index: 2;
+  transition:
+    opacity 220ms ease-in,
+    transform 260ms ease-in;
+}
+.intro-stage.is-leaving {
+  opacity: 0;
+  transform: translateY(-14px) scale(0.98);
+}

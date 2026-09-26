@@ -1,4 +1,5 @@
 import { m, type Variants } from 'motion/react'
+import { useIntroDone } from '../lib/intro'
 import { profile } from '../data/profile'
 import PixelButton from './PixelButton'
 import PixelIcon from './PixelIcon'
@@ -20,10 +21,12 @@ const item: Variants = {
 }
 
 export default function Hero() {
+  // On a first visit, the copy slides in as the opening animation clears
+  const ready = useIntroDone()
   return (
     <section className="relative mx-auto grid w-full max-w-7xl flex-1 items-center gap-10 px-5 py-8 sm:px-8 lg:grid-cols-[1.15fr_1fr] lg:gap-10 lg:px-24 lg:py-0">
       {/* Left — name + story */}
-      <m.div variants={container} initial="hidden" animate="show" className="min-w-0 max-w-2xl">
+      <m.div variants={container} initial="hidden" animate={ready ? 'show' : 'hidden'} className="min-w-0 max-w-2xl">
         <m.h1
           variants={item}
           className="font-display text-[clamp(2.75rem,min(6.2vw,10dvh),5.25rem)] leading-[0.95] font-semibold tracking-[-0.035em] text-accent-50"

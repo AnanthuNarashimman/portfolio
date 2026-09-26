@@ -1,4 +1,5 @@
 import { m } from 'motion/react'
+import { useIntroDone } from '../lib/intro'
 import PixelSocialLink from './PixelSocialLink'
 import { socialLinks } from './socialLinks'
 
@@ -22,11 +23,12 @@ function PixelTrail({ flip = false }: { flip?: boolean }) {
 
 // Vertical strip of social links pinned to the hero card's right edge (lg and up)
 export default function SocialRail() {
+  const ready = useIntroDone()
   return (
     <m.nav
       aria-label="Social links"
       initial={{ opacity: 0, x: 12 }}
-      animate={{ opacity: 1, x: 0 }}
+      animate={ready ? { opacity: 1, x: 0 } : undefined}
       transition={{ duration: 0.6, delay: 1.1 }}
       className="absolute top-1/2 right-5 z-20 hidden -translate-y-1/2 flex-col items-center gap-2.5 lg:flex xl:right-7"
     >

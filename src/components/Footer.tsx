@@ -6,6 +6,7 @@ import { profile } from '../data/profile'
 import { sendNote } from '../lib/mail'
 import MailDialog, { type MailField } from './MailDialog'
 import PixelButton from './PixelButton'
+import { PIXEL_FONT } from './pixelFont'
 import PixelSocialLink from './PixelSocialLink'
 import { socialLinks } from './socialLinks'
 import './footer.css'
@@ -56,14 +57,7 @@ function LocalTime() {
 
 /* ---------- The half-sunk name ---------- */
 
-// Chunky 6×7 pixel letters, two-pixel strokes
-const GLYPH: Record<string, string[]> = {
-  A: ['.####.', '##..##', '##..##', '######', '##..##', '##..##', '##..##'],
-  N: ['##..##', '###.##', '######', '##.###', '##..##', '##..##', '##..##'],
-  T: ['######', '..##..', '..##..', '..##..', '..##..', '..##..', '..##..'],
-  H: ['##..##', '##..##', '##..##', '######', '##..##', '##..##', '##..##'],
-  U: ['##..##', '##..##', '##..##', '##..##', '##..##', '##..##', '.####.'],
-}
+const GLYPH = PIXEL_FONT
 const NAME = 'ANANTHU'
 const STEP = 7 // letter width 6 + 1 gap
 const VW = NAME.length * STEP // includes half a unit of margin each side

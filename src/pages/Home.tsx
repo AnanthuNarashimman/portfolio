@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useSyncExternalStore, type CSSProperties } from 'react'
 import { useLocation } from 'react-router'
+import { useAfterIntro } from '../lib/intro'
 import Experience from '../components/Experience'
 import Hero from '../components/Hero'
 import Navbar from '../components/Navbar'
@@ -29,6 +30,9 @@ export default function Home() {
   const { hash } = useLocation()
   // The interlude only shows at lg+, so phones never download its chunk
   const desktop = useMedia('(min-width: 1024px)')
+  // Lazy sections below the fold load once the opening animation and hero entrance are done, so their
+  // download, parse and first render never compete with those animations (sooner if a #section was asked for)
+  const later = useAfterIntro(hash ? 0 : 700)
 
   // Arriving at /#section (e.g. back from a project page): sections below load lazily, so wait for
   // the target to exist, jump to it, then re-align once the lazy chunks above it have settled
@@ -40,7 +44,7 @@ export default function Home() {
     const find = () => {
       const el = document.querySelector(hash)
       if (el) el.scrollIntoView()
-      else if (tries++ < 120) raf = requestAnimationFrame(find)
+      else if (tries++ < 360) raf = requestAnimationFrame(find)
     }
     raf = requestAnimationFrame(find)
     return () => {
@@ -89,22 +93,37 @@ export default function Home() {
         </div>
       </div>
 
-      {desktop && (
-        <Suspense fallback={<div aria-hidden="true" className="mt-16 hidden h-[calc(343.5px+min(420px,(100vw-80px)*0.34375))] lg:block" />}>
-          <Breather />
-        </Suspense>
-      )}
+      {desktop &&
+        (later ? (
+          <Suspense fallback={<div aria-hidden="true" className="mt-16 hidden h-[calc(343.5px+min(420px,(100vw-80px)*0.34375))] lg:block" />}>
+            <Breather />
+          </Suspense>
+        ) : (
+          <div aria-hidden="true" className="mt-16 hidden h-[calc(343.5px+min(420px,(100vw-80px)*0.34375))] lg:block" />
+        ))}
       <Projects />
-      <Suspense fallback={<div className="h-[520px]" />}>
-        <TechStack />
-      </Suspense>
+      {later ? (
+        <Suspense fallback={<div className="h-[520px]" />}>
+          <TechStack />
+        </Suspense>
+      ) : (
+        <div className="h-[520px]" />
+      )}
       <Experience />
-      <Suspense fallback={<div className="h-[640px]" />}>
-        <Hackathons />
-      </Suspense>
-      <Suspense fallback={<div className="h-[900px]" />}>
-        <Now />
-      </Suspense>
+      {later ? (
+        <Suspense fallback={<div className="h-[640px]" />}>
+          <Hackathons />
+        </Suspense>
+      ) : (
+        <div className="h-[640px]" />
+      )}
+      {later ? (
+        <Suspense fallback={<div className="h-[900px]" />}>
+          <Now />
+        </Suspense>
+      ) : (
+        <div className="h-[900px]" />
+      )}
     </main>
   )
 }

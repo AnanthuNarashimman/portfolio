@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { m } from 'motion/react'
 import { ArrowUpRight } from 'lucide-react'
 import avatar from '../assets/avatar.webp'
+import { useIntroDone } from '../lib/intro'
 import { navLinks, profile } from '../data/profile'
 import PixelButton from './PixelButton'
 import ThemeToggle from './ThemeToggle'
@@ -44,6 +45,7 @@ function useScrollNav() {
 // One pill: avatar on the left, section links in the middle, "Let's talk" on the right
 export default function Navbar() {
   const { hidden, solid } = useScrollNav()
+  const ready = useIntroDone()
   // Keyboard users tabbing into a hidden navbar get it back. Only real keyboard focus counts: a mouse
   // click (e.g. on the theme toggle) also focuses, and that mustn't pin the navbar in place
   const [focused, setFocused] = useState(false)
@@ -61,7 +63,7 @@ export default function Navbar() {
     >
       <m.header
         initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={ready ? { opacity: 1, y: 0 } : undefined}
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="mx-auto flex w-full max-w-7xl justify-center"
       >
