@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { domAnimation, LazyMotion } from 'motion/react'
 import { Route, Routes } from 'react-router'
 import Intro from './components/Intro'
@@ -16,6 +17,8 @@ export default function App() {
     // Only the animation features the site uses (no layout/drag), via the lightweight `m` components
     <LazyMotion features={domAnimation} strict>
       <Intro />
+      {/* Vercel Web Analytics: page views, including client-side route changes */}
+      <Analytics />
       <Suspense fallback={<div className="min-h-dvh" />}>
         <Routes>
           <Route path="/" element={<Home />} />
