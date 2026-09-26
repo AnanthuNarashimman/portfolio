@@ -6,6 +6,8 @@ import './projects.css'
 import type { CSSProperties } from 'react'
 import { projects, type Project } from '../data/projects'
 
+const featured = projects.filter((p) => p.featured)
+
 const px = (n: number) => ({ '--px': `${n}px` }) as CSSProperties
 
 // Stepped 8-bit sky bands for the image placeholder, one palette per card for variety
@@ -73,7 +75,7 @@ const RAIN = Array.from({ length: 32 }, (_, i) => ({
 }))
 
 /** Stepped pixel line that closes the section */
-function PixelDivider() {
+export function PixelDivider() {
   return (
     <div aria-hidden="true" className="-mx-5 mt-24 flex items-end sm:-mx-8">
       {Array.from({ length: 96 }, (_, i) => {
@@ -87,7 +89,7 @@ function PixelDivider() {
 }
 
 /** Falling pixel trails behind the whole section */
-function PixelRain() {
+export function PixelRain() {
   return (
     <div aria-hidden="true" className="pixel-rain pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       {RAIN.map((r, i) => (
@@ -145,7 +147,10 @@ function CornerStairs() {
   )
 }
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+// Status chip: dot colour tells live / offline / local-only at a glance
+const STATUS_DOT: Record<Project['status'], string> = { Live: 'bg-[#3fae4f]', Offline: 'bg-[#9a918b]', Local: 'bg-accent-400' }
+
+export function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
     <article className="group relative">
       {/* Hard 8-bit offset shadow; the card slides toward it on hover */}
@@ -156,7 +161,12 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       >
         <div className="card-body pixel-corners relative flex h-full flex-col overflow-hidden" style={px(6)}>
           {project.image ? (
-            <img src={project.image} alt={`${project.title} screenshot`} className="aspect-[16/9] w-full object-cover object-top" loading="lazy" />
+            <img
+              src={project.image}
+              alt={`${project.title} screenshot`}
+              className={`aspect-[16/9] w-full object-cover object-top ${project.status === 'Offline' ? 'opacity-80 grayscale-[60%]' : ''}`}
+              loading="lazy"
+            />
           ) : (
             <ImagePlaceholder index={index} title={project.title} />
           )}
@@ -166,14 +176,17 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             <div aria-hidden="true" className="card-grid pointer-events-none absolute inset-0 -z-10" />
             <CornerStairs />
             <RisingPixels />
-            <div className="flex items-center gap-2 font-mono text-[11px] tracking-[0.18em] uppercase">
+            <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] tracking-[0.18em] uppercase">
               <span className="text-accent-700 dark:text-accent-300">CH {String(index + 1).padStart(2, '0')}</span>
+              <span className="pixel-corners bg-accent-600 px-2 py-0.5 text-accent-50 dark:bg-accent-700" style={px(2)}>
+                {project.category}
+              </span>
               <span
                 className="pixel-corners inline-flex items-center gap-1.5 bg-accent-100 px-2 py-0.5 text-accent-800 dark:bg-white/5 dark:text-accent-200"
                 style={px(2)}
               >
-                <span aria-hidden="true" className="size-1.5 bg-[#3fae4f]" />
-                {project.status}
+                <span aria-hidden="true" className={`size-1.5 ${STATUS_DOT[project.status]}`} />
+                {project.status === 'Offline' ? 'Currently offline' : project.status === 'Local' ? 'Runs locally' : 'Live'}
               </span>
             </div>
 
@@ -204,11 +217,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                     How it works
                     <ArrowRight className="size-4 transition-transform group-hover/link:translate-x-0.5" />
                   </Link>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 text-ink/35 dark:text-accent-100/35" title="Breakdown coming soon">
-                    How it works · soon
-                  </span>
-                )}
+                ) : null}
                 {project.github && (
                   <a
                     href={project.github}
@@ -250,7 +259,7 @@ export default function Projects() {
       </div>
 
       <div className="mx-auto mt-12 grid max-w-6xl gap-9 md:grid-cols-2">
-        {projects.map((p, i) => (
+        {featured.map((p, i) => (
           <ProjectCard key={p.slug} project={p} index={i} />
         ))}
       </div>
@@ -258,8 +267,7 @@ export default function Projects() {
       <NpmPackages />
 
       <div className="mt-14 flex justify-center">
-        {/* Not wired up yet — the full projects page comes later */}
-        <a href="#" onClick={(e) => e.preventDefault()} className="group relative inline-flex">
+        <Link to="/projects" className="group relative inline-flex">
           <span aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-1.5 translate-y-1.5 bg-accent-900/60" style={px(4)} />
           <span
             className="pixel-corners relative inline-flex items-center gap-2 bg-accent-300 px-6 py-3 text-sm font-bold text-accent-800 transition-[translate,background-color] duration-150 group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:bg-accent-200 group-active:translate-x-1.5 group-active:translate-y-1.5"
@@ -268,7 +276,7 @@ export default function Projects() {
             See all my work
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
           </span>
-        </a>
+        </Link>
       </div>
 
       {/* Pixel divider: ends the section, and the pixel rain lands on it */}

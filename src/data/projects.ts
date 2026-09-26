@@ -2,6 +2,12 @@ import syntaxShot from '../assets/projects/syntax.webp'
 import algoflowShot from '../assets/projects/algoflow.webp'
 import damnjsShot from '../assets/projects/damnjs.webp'
 import vibeauditShot from '../assets/projects/vibeaudit.webp'
+import shipstatShot from '../assets/projects/shipstat.webp'
+import orchatShot from '../assets/projects/orchat.webp'
+import trimtweetShot from '../assets/projects/trimtweet.webp'
+import genteachShot from '../assets/projects/genteach.webp'
+import pingmyphoneShot from '../assets/projects/pingmyphone.webp'
+import termiShot from '../assets/projects/termi.webp'
 
 // Featured projects. `detail` powers the /projects/:slug "How it works" page; projects without it
 // show the card only. Screenshots drop in via `image`; a pixel placeholder shows until then.
@@ -26,13 +32,19 @@ export type ProjectDetail = {
   }
 }
 
+// Category badges; the /projects page filters by these
+export const categories = ['AI & agents', 'Developer tools', 'Learning', 'Utilities'] as const
+export type Category = (typeof categories)[number]
+
 export type Project = {
   slug: string
+  category: Category
+  featured?: boolean // shown on the home page
   title: string
   tagline: string
   description: string
   stack: string[]
-  status: 'Live' | 'Coming up'
+  status: 'Live' | 'Offline' | 'Local'
   image?: string
   github?: string
   demo?: string
@@ -42,6 +54,8 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: 'syntax',
+    category: 'Learning',
+    featured: true,
     title: 'Syntax',
     tagline: 'Contest platform for campuses and coding clubs',
     description:
@@ -88,6 +102,8 @@ export const projects: Project[] = [
   },
   {
     slug: 'vibeaudit',
+    category: 'AI & agents',
+    featured: true,
     title: 'VibeAudit',
     tagline: 'AI design auditor for any website',
     description:
@@ -156,6 +172,8 @@ export const projects: Project[] = [
   },
   {
     slug: 'algoflow',
+    category: 'Learning',
+    featured: true,
     title: 'AlgoFlow',
     tagline: 'Code to interactive flowcharts, in real time',
     description:
@@ -203,6 +221,8 @@ export const projects: Project[] = [
   },
   {
     slug: 'damn-js',
+    category: 'Developer tools',
+    featured: true,
     title: 'damn.js',
     tagline: 'Chrome DevTools extension that explains your errors',
     description:
@@ -264,6 +284,80 @@ export const projects: Project[] = [
         ],
       },
     },
+  },
+  {
+    slug: 'shipstat',
+    category: 'Developer tools',
+    title: 'shipstat',
+    tagline: 'Honest npm download stats, with cards worth sharing',
+    description:
+      'All-time and weekly downloads, release impact and version adoption for any npm package, straight from npm with nothing estimated. npm’s zero-data days are flagged instead of drawn as crashes, and every package gets a share card that unfurls anywhere.',
+    stack: ['Next.js 16', 'React 19', 'TypeScript', 'Tailwind 4', 'SVG charts', 'ISR'],
+    status: 'Live',
+    image: shipstatShot,
+    github: 'https://github.com/AnanthuNarashimman/shipstat',
+    demo: 'https://shipstat.ananthu.xyz',
+  },
+  {
+    slug: 'trimtweet',
+    category: 'AI & agents',
+    title: 'TrimTweet',
+    tagline: 'AI post optimizer for X',
+    description:
+      'Paste a long post and get one that fits X’s 280 characters while keeping your voice, with 3–5 smart hashtags and one-click copy. Gemini 2.5 Flash Lite does the trimming on Vercel serverless functions.',
+    stack: ['React 19', 'Vite', 'Gemini', 'Vercel Functions'],
+    status: 'Live',
+    image: trimtweetShot,
+    github: 'https://github.com/AnanthuNarashimman/trim_tweet',
+    demo: 'https://trim-tweetx.vercel.app/',
+  },
+  {
+    slug: 'termi',
+    category: 'AI & agents',
+    title: 'Termi',
+    tagline: 'Natural language to PowerShell, with a human in the loop',
+    description:
+      'Describe what you want and a Gemini-powered CLI agent proposes the PowerShell command with a plain-English explanation. Nothing runs until you confirm, and everything executes inside a sandboxed workspace folder.',
+    stack: ['Python', 'Gemini 2.5 Flash', 'PowerShell', 'google-genai'],
+    status: 'Local',
+    image: termiShot,
+    github: 'https://github.com/AnanthuNarashimman/Termi',
+  },
+  {
+    slug: 'or-chat',
+    category: 'AI & agents',
+    title: 'OR Chat',
+    tagline: 'Local LLM chat with semantic memory',
+    description:
+      'Built to try out OpenRouter: switch between free NVIDIA, Arcee and StepFun models in one chat, while Pinecone gives conversations long-term semantic memory. A small, finished experiment that runs locally.',
+    stack: ['Node.js', 'Express', 'OpenRouter', 'Pinecone'],
+    status: 'Local',
+    image: orchatShot,
+    github: 'https://github.com/AnanthuNarashimman/or-chat',
+  },
+  {
+    slug: 'genteach',
+    category: 'Learning',
+    title: 'GenTeach',
+    tagline: 'AI studio for bite-sized learning content',
+    description:
+      'Turns a prompt into scripts, quizzes, audio summaries and short videos: Gemini writes, Vertex AI draws, Google TTS narrates and MoviePy stitches it together, with an admin approval queue in front to keep costs in check.',
+    stack: ['React', 'Flask', 'Gemini', 'Vertex AI', 'Cloud TTS', 'MoviePy', 'Firebase'],
+    status: 'Offline',
+    image: genteachShot,
+    github: 'https://github.com/AnanthuNarashimman/GenTeach',
+  },
+  {
+    slug: 'pingmyphone',
+    category: 'Utilities',
+    title: 'Ping My Phone',
+    tagline: 'Scheduled reminders, delivered on Telegram',
+    description:
+      'Set a reminder for any date and time in IST and a Telegram bot delivers it. GitHub Actions trigger the sends on a schedule, so each reminder lands within 15 minutes of its time, with full create, edit and delete from a dashboard.',
+    stack: ['Flask', 'Firebase', 'Telegram Bot API', 'GitHub Actions'],
+    status: 'Offline',
+    image: pingmyphoneShot,
+    github: 'https://github.com/AnanthuNarashimman/PingMyPhone',
   },
 ]
 
