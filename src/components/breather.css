@@ -251,3 +251,11 @@
     linear-gradient(var(--color-accent-900), var(--color-accent-900)) 100% 100% / 16px 16px no-repeat,
     #e0b54a;
 }
+
+/* The scene fades in once every frame is decoded */
+.b-ready {
+  animation: b-ready 400ms ease-out both;
+}
+@keyframes b-ready {
+  from { opacity: 0; }
+}

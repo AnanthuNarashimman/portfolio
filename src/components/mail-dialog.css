@@ -1,0 +1,12 @@
+/* Pixel mail dialog */
+
+.mail-dialog::backdrop {
+  background: rgb(20 8 6 / 0.7);
+}
+.mail-dialog[open] {
+  animation: mail-pop 180ms steps(3) both;
+}
+@keyframes mail-pop {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

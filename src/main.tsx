@@ -4,6 +4,9 @@ import { BrowserRouter } from 'react-router'
 import '@fontsource/geist-mono/latin-400.css'
 import './index.css'
 import App from './App.tsx'
+import { initScrollFx } from './lib/scrollFx'
+
+initScrollFx()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

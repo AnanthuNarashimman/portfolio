@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { ArrowUpRight } from 'lucide-react'
 import avatar from '../assets/avatar.webp'
 import { navLinks, profile } from '../data/profile'
@@ -8,13 +8,13 @@ import ThemeToggle from './ThemeToggle'
 // One pill: avatar on the left, section links in the middle, "Let's talk" on the right
 export default function Navbar() {
   return (
-    <motion.header
+    <m.header
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
       className="relative z-20 mx-auto flex w-full max-w-7xl justify-center px-5 pt-5 sm:px-8 lg:px-24"
     >
-      <div className="flex w-full items-center gap-1 rounded-full border border-accent-200/20 bg-white/5 p-1.5 backdrop-blur-md md:w-auto">
+      <div className="flex w-full items-center gap-1 rounded-full border border-accent-200/20 bg-white/[0.07] p-1.5 md:w-auto">
         <a href="#" aria-label={`${profile.firstName} ${profile.lastName} — home`} className="shrink-0 rounded-full">
           <img
             src={avatar}
@@ -45,6 +45,6 @@ export default function Navbar() {
           <ArrowUpRight className="size-4" />
         </PixelButton>
       </div>
-    </motion.header>
+    </m.header>
   )
 }

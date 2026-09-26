@@ -1,0 +1,39 @@
+/* Now section */
+
+/* Today's segment in the month bar blinks like a cursor */
+.now-today {
+  animation: now-blink 1s steps(1, end) infinite;
+}
+@keyframes now-blink {
+  50% { opacity: 0.3; }
+}
+
+/* "Live" square next to the label: grows in whole pixel steps */
+.now-live {
+  animation: now-live 1.6s steps(3) infinite;
+}
+@keyframes now-live {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(208 49 30 / 0.45); }
+  50% { box-shadow: 0 0 0 4px rgb(208 49 30 / 0); }
+}
+
+.now-skeleton {
+  animation: now-load 1.2s steps(2, end) infinite;
+}
+@keyframes now-load {
+  50% { opacity: 0.55; }
+}
+
+.now-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(208 49 30 / 0.4) transparent;
+}
+
+/* Backdrop: big pixel clouds drifting back and forth */
+.now-cloud {
+  animation: now-drift ease-in-out infinite alternate;
+}
+@keyframes now-drift {
+  from { transform: translateX(-24px); }
+  to { transform: translateX(24px); }
+}

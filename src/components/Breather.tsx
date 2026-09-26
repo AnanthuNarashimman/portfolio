@@ -511,7 +511,7 @@ export default function Breather() {
       <PixelWaveBand />
       <div className="mx-auto w-full max-w-[1760px] px-10">
         {/* Centred heading on a small pixel-tile plate that hugs the text */}
-        <div className="text-center">
+        <div data-reveal className="text-center">
           {/* Framed like the project cards: hard offset shadow, crimson pixel border, solid gaps between tiles */}
           <div className="relative inline-block">
             <div
@@ -538,8 +538,9 @@ export default function Breather() {
 
         {/* In dark mode a thin glowing crimson pixel frame lifts the (dark) scene off the maroon band */}
         <div
+          data-reveal
           className="pixel-corners mt-8 dark:bg-gradient-to-b dark:from-accent-400/70 dark:via-accent-600/60 dark:to-accent-700/70 dark:p-[3px]"
-          style={vars({ '--px': '10px' })}
+          style={vars({ '--px': '10px', '--reveal-delay': '120ms' })}
         >
           <div className="pixel-corners bg-[#141010] shadow-2xl shadow-ink/25" style={vars({ '--px': '8px' })}>
             <svg
@@ -550,7 +551,7 @@ export default function Breather() {
               aria-label="Pixel-art test bay: a tiny Ananthu fires a homemade repulsor glove at a crash-test dummy; it backfires, he scratches his head, flips the glove around, and knocks the dummy back with a direct hit."
             >
               {art && (
-                <>
+                <g className="b-ready">
                   <image href={art.backdrop} x={-EXT} width={W + EXT * 2} height={440} style={pixelated} />
                   <Holo fx={fx} attempt={loop + 1} />
                   {!still && <RackLeds />}
@@ -585,7 +586,7 @@ export default function Breather() {
                   {fx === 'backfire' && !still && (
                     <rect key={`flash-${key}`} x={-EXT} width={W + EXT * 2} height="440" fill="#ff9a4a" style={anim('b-flash 300ms steps(3) both')} />
                   )}
-                </>
+                </g>
               )}
             </svg>
           </div>

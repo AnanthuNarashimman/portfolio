@@ -1,4 +1,4 @@
-import { motion, type Variants } from 'motion/react'
+import { m, type Variants } from 'motion/react'
 import { profile } from '../data/profile'
 import PixelButton from './PixelButton'
 import PixelIcon from './PixelIcon'
@@ -23,8 +23,8 @@ export default function Hero() {
   return (
     <section className="relative mx-auto grid w-full max-w-7xl flex-1 items-center gap-10 px-5 py-8 sm:px-8 lg:grid-cols-[1.15fr_1fr] lg:gap-10 lg:px-24 lg:py-0">
       {/* Left — name + story */}
-      <motion.div variants={container} initial="hidden" animate="show" className="min-w-0 max-w-2xl">
-        <motion.h1
+      <m.div variants={container} initial="hidden" animate="show" className="min-w-0 max-w-2xl">
+        <m.h1
           variants={item}
           className="font-display text-[clamp(2.75rem,min(6.2vw,10dvh),5.25rem)] leading-[0.95] font-semibold tracking-[-0.035em] text-accent-50"
         >
@@ -33,9 +33,9 @@ export default function Hero() {
           <span className="bg-gradient-to-r from-accent-300 via-accent-200 to-accent-100 bg-clip-text text-transparent">
             {profile.lastName}
           </span>
-        </motion.h1>
+        </m.h1>
 
-        <motion.p
+        <m.p
           variants={item}
           className="mt-[min(2.25rem,3.6dvh)] font-display text-2xl leading-tight font-medium tracking-[-0.015em] text-accent-50 sm:text-3xl xl:text-[2.125rem]"
         >
@@ -51,10 +51,10 @@ export default function Hero() {
               </span>
             </span>
           </span>
-        </motion.p>
+        </m.p>
 
         {/* White, not cream: the only tint that keeps ≥4.5:1 against the lightest red of the card */}
-        <motion.p
+        <m.p
           variants={item}
           className="mt-[min(1.75rem,3dvh)] max-w-[26.5em] text-[1.125rem] leading-relaxed text-white sm:text-[1.1875rem] lg:text-[clamp(1.0625rem,2.1dvh,1.1875rem)]"
         >
@@ -67,9 +67,9 @@ export default function Hero() {
               part
             ),
           )}
-        </motion.p>
+        </m.p>
 
-        <motion.div variants={item} className="mt-[min(2.75rem,4.8dvh)] flex flex-wrap items-center gap-3">
+        <m.div variants={item} className="mt-[min(2.75rem,4.8dvh)] flex flex-wrap items-center gap-3">
           <PixelButton href="#projects">
             See my work
             <PixelIcon name="computer" className="h-[18px] w-5" />
@@ -81,8 +81,8 @@ export default function Hero() {
               <PixelSocialLink key={label} href={href} label={label} pixel={pixel} />
             ))}
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
 
       {/* Right — portrait tearing through the card */}
       <TornPortrait />

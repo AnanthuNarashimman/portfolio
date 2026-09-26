@@ -152,7 +152,7 @@ const STATUS_DOT: Record<Project['status'], string> = { Live: 'bg-[#3fae4f]', Of
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
-    <article className="group relative">
+    <article data-reveal className="group relative" style={{ '--reveal-delay': `${(index % 2) * 110}ms` } as CSSProperties}>
       {/* Hard 8-bit offset shadow; the card slides toward it on hover */}
       <div aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-2 translate-y-2 bg-accent-900/25 dark:bg-black/60" style={px(6)} />
       <div
@@ -253,7 +253,7 @@ export default function Projects() {
   return (
     <section id="projects" className="relative isolate mx-auto w-full max-w-7xl scroll-mt-4 px-5 pt-24 sm:px-8">
       <PixelRain />
-      <div className="lg:px-16">
+      <div data-reveal className="lg:px-16">
         <p className="font-mono text-xs tracking-[0.2em] text-accent-700 uppercase dark:text-accent-300">Featured projects</p>
         <h2 className="mt-3 font-display text-4xl font-semibold tracking-[-0.03em] text-ink sm:text-5xl dark:text-accent-50">Work, live on air.</h2>
       </div>

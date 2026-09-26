@@ -97,7 +97,7 @@ export default function NpmPackages() {
   const total = npmPackages.reduce((n, p) => n + p.downloads, 0)
   const rounded = total >= 1000 ? `${Math.floor(total / 1000) * 1000}+` : `${total}`
   return (
-    <div className="relative mx-auto mt-16 max-w-6xl">
+    <div data-reveal className="relative mx-auto mt-16 max-w-6xl">
       <div aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-2 translate-y-2 bg-accent-900/30 dark:bg-black/60" style={px(8)} />
       <div className="pixel-corners relative overflow-hidden bg-gradient-to-br from-accent-600 via-accent-700 to-accent-800 p-6 sm:p-8" style={px(8)}>
         {/* Faint line grid, like the hero card */}

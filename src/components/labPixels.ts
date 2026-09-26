@@ -915,12 +915,25 @@ export type LabArt = {
 let cache: Promise<LabArt> | null = null
 export const BEAM_LEN = 90
 
+/** Resolves once an image URL is fully decoded, so the first frame it's shown in paints instantly */
+function decoded(src: string) {
+  const img = new Image()
+  img.src = src
+  return img.decode().catch(() => {})
+}
+
+// Let the browser paint between heavy generation steps instead of freezing one long frame
+const idle = () => new Promise<void>((r) => ('requestIdleCallback' in window ? requestIdleCallback(() => r(), { timeout: 200 }) : setTimeout(r, 0)))
+
 export function buildLabArt(frameSrcs: string[]): Promise<LabArt> {
-  cache ??= (async () => ({
-    backdrop: drawBackdrop(),
-    dummy: drawDummySheet(),
-    frames: await Promise.all(frameSrcs.map(pixelateFrame)),
-    fx: {
+  cache ??= (async () => {
+    const frames = await Promise.all(frameSrcs.map(pixelateFrame))
+    await idle()
+    const backdrop = drawBackdrop()
+    await idle()
+    const dummy = drawDummySheet()
+    await idle()
+    const fx = {
       orb: chargeOrb(),
       boom: explosion(52, 9, 5, 1),
       hit: explosion(34, 7, 17, 0.6),
@@ -928,7 +941,10 @@ export function buildLabArt(frameSrcs: string[]): Promise<LabArt> {
       beam: beam(BEAM_LEN),
       smoke: smokePuff(),
       swirl: swirl(),
-    },
-  }))()
+    }
+    // Every frame and sprite sheet decoded up front: the loop never starts on a half-loaded frame
+    await Promise.all([backdrop, dummy, ...frames, ...Object.values(fx)].map(decoded))
+    return { backdrop, dummy, frames, fx }
+  })()
   return cache
 }

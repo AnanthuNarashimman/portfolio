@@ -24,27 +24,32 @@ const corners = [
   'right-0 bottom-0 -scale-100',
 ]
 
+// Pixels grouped into thin distance bands. Each band is its own <svg> that pulses as a whole, so the
+// ripple runs as a GPU opacity animation on a few layers instead of restyling ~50 SVG rects per frame
+const BUCKET = BAND / 5.44 // ≈0.625 cells: two bands per ring, so the ripple still travels outward
+const bands = Object.values(
+  pixels.reduce<Record<number, Pixel[]>>((acc, p) => {
+    ;(acc[Math.floor(p.d / BUCKET)] ??= []).push(p)
+    return acc
+  }, {}),
+)
+
 function Wave({ className }: { className: string }) {
   return (
-    <svg
-      viewBox={`0 0 ${size} ${size}`}
-      className={`absolute m-5 hidden w-32 text-accent-300 sm:block xl:w-40 2xl:w-48 ${className}`}
-    >
-      {pixels.map(({ x, y, d }) => (
-        <rect
-          key={`${x}-${y}`}
-          x={x}
-          y={y}
-          width={CELL}
-          height={CELL}
-          rx={2}
-          fill="currentColor"
-          fillOpacity={Math.max(0.08, 0.7 * (1 - d / GRID))}
-          className="pixel-wave"
-          style={{ animationDelay: `${d * 0.14}s` }}
-        />
+    <div className={`absolute m-5 hidden aspect-square w-32 text-accent-300 sm:block xl:w-40 2xl:w-48 ${className}`}>
+      {bands.map((band) => (
+        <svg
+          key={band[0].d}
+          viewBox={`0 0 ${size} ${size}`}
+          className="pixel-wave absolute inset-0 size-full"
+          style={{ animationDelay: `${Math.floor(band[0].d / BUCKET) * BUCKET * 0.14}s` }}
+        >
+          {band.map(({ x, y, d }) => (
+            <rect key={`${x}-${y}`} x={x} y={y} width={CELL} height={CELL} rx={2} fill="currentColor" fillOpacity={Math.max(0.08, 0.7 * (1 - d / GRID))} />
+          ))}
+        </svg>
       ))}
-    </svg>
+    </div>
   )
 }
 

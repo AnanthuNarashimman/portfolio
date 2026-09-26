@@ -40,7 +40,7 @@ export default function AllProjects() {
           <ThemeToggle />
         </div>
 
-        <header className="pt-8 lg:px-16">
+        <header data-reveal className="pt-8 lg:px-16">
           <p className="font-mono text-xs tracking-[0.2em] text-accent-700 uppercase dark:text-accent-300">All projects · {projects.length}</p>
           <h1 className="mt-3 font-display text-5xl font-semibold tracking-[-0.035em] text-ink sm:text-6xl dark:text-accent-50">Some things I’ve shipped.</h1>
           <p className="mt-4 max-w-2xl text-lg text-muted dark:text-accent-100/75">

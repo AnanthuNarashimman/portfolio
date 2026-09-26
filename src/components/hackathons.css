@@ -1,0 +1,33 @@
+/* Hackathon diaries */
+
+/* Speech bubble with a stepped pixel tail pointing back at the character */
+.hack-bubble {
+  box-shadow: 4px 4px 0 0 rgb(0 0 0 / 0.5);
+}
+.hack-bubble::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  background: #fff7ef;
+  clip-path: polygon(100% 0, 100% 100%, 66% 100%, 66% 66%, 33% 66%, 33% 33%, 0 33%, 0 0);
+}
+
+.hack-blink {
+  animation: hack-blink 1s steps(1, end) infinite;
+}
+@keyframes hack-blink {
+  50% { opacity: 0; }
+}
+
+/* Wi-Fi arcs light up one after another */
+.hack-wifi {
+  animation: hack-wifi 1.4s steps(1, end) infinite;
+}
+@keyframes hack-wifi {
+  0% { opacity: 0.25; }
+  30%, 100% { opacity: 1; }
+}

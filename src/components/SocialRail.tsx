@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import PixelSocialLink from './PixelSocialLink'
 import { socialLinks } from './socialLinks'
 
@@ -23,7 +23,7 @@ function PixelTrail({ flip = false }: { flip?: boolean }) {
 // Vertical strip of social links pinned to the hero card's right edge (lg and up)
 export default function SocialRail() {
   return (
-    <motion.nav
+    <m.nav
       aria-label="Social links"
       initial={{ opacity: 0, x: 12 }}
       animate={{ opacity: 1, x: 0 }}
@@ -35,6 +35,6 @@ export default function SocialRail() {
         <PixelSocialLink key={label} href={href} label={label} pixel={pixel} />
       ))}
       <PixelTrail flip />
-    </motion.nav>
+    </m.nav>
   )
 }

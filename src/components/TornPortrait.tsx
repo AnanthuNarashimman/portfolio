@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react'
+import { m, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react'
 import { useEffect, useState, type PointerEvent, type ReactNode } from 'react'
 import portrait from '../assets/portrait.webp'
 import { profile } from '../data/profile'
@@ -251,7 +251,7 @@ type LayerProps = {
 // One stacked scene layer. It only ever moves/fades as a whole (a cheap transform), so its content is painted once.
 function Layer({ x, y, children, initial, play = true, delay = 0 }: LayerProps) {
   return (
-    <motion.div
+    <m.div
       className="pointer-events-none absolute inset-0 will-change-transform"
       style={{ x, y }}
       initial={initial}
@@ -261,7 +261,7 @@ function Layer({ x, y, children, initial, play = true, delay = 0 }: LayerProps) 
       <svg viewBox={VIEWBOX} className="absolute inset-0 size-full overflow-visible">
         {children}
       </svg>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -312,7 +312,7 @@ export default function TornPortrait() {
       aria-label={`Illustration of ${profile.firstName} bursting through the page`}
     >
       <Defs />
-      <motion.div className="absolute inset-0" style={{ rotateX, rotateY, transformPerspective: 1100 }}>
+      <m.div className="absolute inset-0" style={{ rotateX, rotateY, transformPerspective: 1100 }}>
         {/* The tear in the card — pops open as one pre-painted layer */}
         <Layer x={tearX} y={tearY} initial={{ opacity: 0, scale: 0.55 }} play={play} delay={0.05}>
           {/* Shadow the lifted, peeled edge casts on the card */}
@@ -338,22 +338,22 @@ export default function TornPortrait() {
         {/* The portrait: rises through the hole, then leans and lifts toward the cursor — no filters, just an image in a vector clip */}
         <Layer x={tearX} y={tearY}>
           <g clipPath="url(#burst-clip)">
-            <motion.g style={{ x: headX, y: headY, rotate: headTurn, transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
-              <motion.g
+            <m.g style={{ x: headX, y: headY, rotate: headTurn, transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
+              <m.g
                 initial={{ y: 160, opacity: 0 }}
                 animate={play ? { y: 0, opacity: 1 } : undefined}
                 transition={{ ...pop, delay: 0.25, opacity: { duration: 0.25, delay: 0.25 } }}
               >
                 <image href={portrait} x="0" y="0" width={IMG} height={IMG} />
-              </motion.g>
-            </motion.g>
+              </m.g>
+            </m.g>
           </g>
         </Layer>
 
         {/* Gold sparkles drift the other way for depth */}
         <Layer x={sparkX} y={sparkY}>
           {SPARKLES.map(([x, y, s], i) => (
-            <motion.path
+            <m.path
               key={i}
               d={SPARKLE}
               fill="#f7d87f"
@@ -364,7 +364,7 @@ export default function TornPortrait() {
             />
           ))}
         </Layer>
-      </motion.div>
+      </m.div>
     </div>
   )
 }

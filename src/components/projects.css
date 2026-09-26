@@ -5,7 +5,7 @@
   background: linear-gradient(180deg, #fffaf1 0%, #fdf0dc 100%);
 }
 .dark .card-body {
-  background: linear-gradient(180deg, #251513 0%, #1b0f0d 100%);
+  background: linear-gradient(180deg, #36191a 0%, #2b1413 100%);
 }
 
 /* Faint line grid, strongest at the bottom-right and fading up/left */
