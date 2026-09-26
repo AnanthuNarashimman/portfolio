@@ -195,7 +195,7 @@ export default function Footer() {
         <Ticker />
 
         <div className="relative mx-auto max-w-7xl px-5 pt-14 sm:px-8 lg:px-24">
-          <div data-reveal className="grid gap-12 lg:grid-cols-[1.5fr_0.8fr_1fr]">
+          <div data-reveal className="grid gap-12 text-center lg:grid-cols-[1.5fr_0.8fr_1fr] lg:text-left">
             {/* Say hi */}
             <div>
               <p className="font-mono text-xs tracking-[0.25em] text-accent-300 uppercase">Contact</p>
@@ -206,10 +206,10 @@ export default function Footer() {
                   <span className="pixel-corners relative inline-block bg-accent-300 px-2.5 pb-0.5 text-accent-800">mind?</span>
                 </span>
               </h2>
-              <p className="mt-5 max-w-md text-[15px] leading-relaxed text-accent-100/70">
+              <p className="mx-auto mt-5 max-w-md text-[15px] leading-relaxed text-accent-100/70 lg:mx-0">
                 A project, a role, a hackathon, a bug on this site, or just hi. I read everything and reply within a day.
               </p>
-              <div className="mt-7 flex flex-wrap items-center gap-4">
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-4 lg:justify-start">
                 <PixelButton onClick={() => dialogRef.current?.showModal()}>
                   Tell me something <ArrowRight className="size-4" />
                 </PixelButton>
@@ -227,7 +227,7 @@ export default function Footer() {
             {/* Around the site */}
             <nav aria-label="Footer">
               <p className="font-mono text-[11px] font-bold tracking-[0.18em] text-accent-300 uppercase">Around the site</p>
-              <ul className="mt-4 space-y-2.5">
+              <ul className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-3 lg:block lg:space-y-2.5">
                 {SITE.map((l) => (
                   <li key={l.to}>
                     <Link to={l.to} className="group inline-flex items-center gap-2 text-[15px] text-accent-100/75 transition-colors hover:text-accent-50">
@@ -242,7 +242,7 @@ export default function Footer() {
             {/* Elsewhere + local time */}
             <div>
               <p className="font-mono text-[11px] font-bold tracking-[0.18em] text-accent-300 uppercase">Elsewhere</p>
-              <div className="mt-4 flex gap-3">
+              <div className="mt-4 flex justify-center gap-3 lg:justify-start">
                 {socialLinks.map((s) => (
                   <PixelSocialLink key={s.label} href={s.href} label={s.label} pixel={s.pixel} />
                 ))}
@@ -255,8 +255,8 @@ export default function Footer() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-14 flex flex-col gap-4 border-t-2 border-accent-100/20 pt-6 font-mono text-xs text-accent-100/70 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
+          <div className="mt-14 flex flex-col items-center gap-5 border-t-2 border-accent-100/20 pt-6 text-center font-mono text-xs text-accent-100/70 lg:flex-row lg:justify-between lg:gap-4 lg:text-left">
+            <div className="flex flex-col items-center gap-3 lg:flex-row">
               <img src={avatar} alt="" width={40} height={40} loading="lazy" className="size-10 shrink-0 rounded-full ring-2 ring-accent-300/70" />
               <div>
                 <p className="font-display text-sm font-semibold text-accent-50">

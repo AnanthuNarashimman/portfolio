@@ -137,12 +137,15 @@ function Card({ item, level, total, last }: { item: Exp; level: number; total: n
   const [open, setOpen] = useState(false)
   const id = useId()
   return (
-    <li data-reveal className="relative grid grid-cols-[1.5rem_1fr] gap-5 sm:gap-8">
+    <li data-reveal className="relative grid grid-cols-1 gap-3 sm:grid-cols-[1.5rem_1fr] sm:gap-8">
       {/* Rail segment: from this node down to the next (older) one; the oldest item ends the rail */}
       {!last && (
-        <span aria-hidden="true" className="absolute top-10 bottom-[calc(-2.5rem-1.75rem)] left-[11px] w-[2px] bg-accent-600/70 dark:bg-accent-500/60" />
+        <span
+          aria-hidden="true"
+          className="absolute top-3 bottom-[-2.5rem] left-1/2 w-[2px] -translate-x-1/2 bg-accent-600/70 sm:top-10 sm:bottom-[calc(-2.5rem-1.75rem)] sm:left-[11px] sm:translate-x-0 dark:bg-accent-500/60"
+        />
       )}
-      <div className="relative flex justify-center pt-7">
+      <div className="relative flex justify-center sm:pt-7">
         <Node current={item.current} />
       </div>
 
@@ -287,8 +290,11 @@ export default function Experience() {
 
         <div className="relative mt-12">
           {/* "Now" marker at the top of the ladder */}
-          <div className="relative mb-10 flex items-center gap-4 pl-[3px]">
-            <span aria-hidden="true" className="absolute top-[9px] left-[11px] h-[calc(2.5rem+2.5rem)] w-[2px] bg-accent-600/70 dark:bg-accent-500/60" />
+          <div className="relative mb-10 flex flex-col-reverse items-center gap-3 sm:flex-row sm:gap-4 sm:pl-[3px]">
+            <span
+              aria-hidden="true"
+              className="absolute bottom-[-2.5rem] left-1/2 h-[calc(2.5rem+9px)] w-[2px] -translate-x-1/2 bg-accent-600/70 sm:top-[9px] sm:bottom-auto sm:left-[11px] sm:h-[calc(2.5rem+2.5rem)] sm:translate-x-0 dark:bg-accent-500/60"
+            />
             <span aria-hidden="true" className="relative grid size-[18px] place-items-center">
               <span className="exp-pulse absolute inset-0 bg-accent-500/50" />
               <span className="relative size-[18px] bg-accent-600" />

@@ -131,7 +131,7 @@ export default function NpmPackages() {
           </div>
         </div>
 
-        <div className="relative mt-6 grid gap-5 md:grid-cols-2">
+        <div className="relative mt-6 grid grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-2">
           {npmPackages.map((p) => (
             <PackageTile key={p.name} pkg={p} />
           ))}
