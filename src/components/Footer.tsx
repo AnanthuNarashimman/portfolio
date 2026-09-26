@@ -216,10 +216,22 @@ export default function Footer() {
                 <button
                   type="button"
                   onClick={copy}
-                  className="inline-flex cursor-pointer items-center gap-2 font-mono text-sm text-accent-100/70 transition-colors hover:text-accent-300"
+                  className="inline-flex cursor-pointer items-center font-mono text-sm text-accent-100/70 transition-colors hover:text-accent-300"
                 >
-                  {copied ? <Check className="size-4 text-accent-300" /> : <Copy className="size-4" />}
-                  <span aria-live="polite">{copied ? 'Copied!' : profile.email}</span>
+                  {/* Both states share one grid cell, so the button keeps the email's width and nothing reflows */}
+                  <span className="grid">
+                    <span className={`inline-flex items-center justify-center gap-2 transition-opacity [grid-area:1/1] lg:justify-start ${copied ? 'opacity-0' : ''}`}>
+                      <Copy className="size-4" />
+                      {profile.email}
+                    </span>
+                    <span
+                      aria-live="polite"
+                      className={`inline-flex items-center justify-center gap-2 text-accent-300 transition-opacity [grid-area:1/1] lg:justify-start ${copied ? '' : 'opacity-0'}`}
+                    >
+                      <Check className="size-4" />
+                      {copied ? 'Copied to clipboard' : ''}
+                    </span>
+                  </span>
                 </button>
               </div>
             </div>

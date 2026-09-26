@@ -51,6 +51,7 @@ export default function Home() {
 
   return (
     <main className="page-bg bg-paper transition-colors duration-300">
+      <Navbar />
       <div className="min-h-dvh p-2.5 sm:p-4 lg:h-dvh">
         {/* Hero card: stepped pixel corners, with a hard pixel shadow block behind (clip-path can't carry a box-shadow) */}
         <div data-pause className="relative lg:h-full">
@@ -80,7 +81,8 @@ export default function Home() {
             </div>
 
             <PixelWaves />
-            <Navbar />
+            {/* Holds the navbar's place; the navbar itself is fixed (outside the clipped card) so it can follow the scroll */}
+            <div aria-hidden="true" className="h-[74px] shrink-0" />
             <Hero />
             <SocialRail />
           </div>
