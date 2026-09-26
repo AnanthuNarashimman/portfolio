@@ -72,17 +72,20 @@ export default function Hero() {
           )}
         </m.p>
 
-        <m.div variants={item} className="mt-[min(2.75rem,4.8dvh)] flex flex-wrap items-center gap-3">
-          <PixelButton href="#projects">
-            See my work
-            <PixelIcon name="computer" className="h-[18px] w-5" />
-          </PixelButton>
+        {/* Button + socials share a row; if the column is too narrow for both (~19.5rem), they stack centred instead of wrapping ragged */}
+        <m.div variants={item} className="@container mt-[min(2.75rem,4.8dvh)]">
+          <div className="flex flex-wrap items-center gap-3 @max-[19.5rem]:flex-col">
+            <PixelButton href="#projects">
+              See my work
+              <PixelIcon name="computer" className="h-[18px] w-5" />
+            </PixelButton>
 
-          {/* Below lg the card's right-edge rail is hidden, so the socials sit next to the button */}
-          <div className="flex items-center gap-2 lg:hidden">
-            {socialLinks.map(({ href, label, pixel }) => (
-              <PixelSocialLink key={label} href={href} label={label} pixel={pixel} />
-            ))}
+            {/* Below lg the card's right-edge rail is hidden, so the socials sit next to the button */}
+            <div className="flex items-center gap-2 lg:hidden">
+              {socialLinks.map(({ href, label, pixel }) => (
+                <PixelSocialLink key={label} href={href} label={label} pixel={pixel} />
+              ))}
+            </div>
           </div>
         </m.div>
       </m.div>

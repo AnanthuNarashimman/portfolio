@@ -311,7 +311,7 @@ export default function TornPortrait() {
     <div
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
-      className="relative mx-auto aspect-[1180/1230] w-full max-w-md lg:mr-0 lg:w-[min(100%,calc(min(76dvh,700px)*0.959))] lg:max-w-none"
+      className="relative mx-auto aspect-[1180/1230] w-[84%] max-w-md sm:w-full lg:mr-0 lg:w-[min(100%,calc(min(76dvh,700px)*0.959))] lg:max-w-none"
       role="img"
       aria-label={`Illustration of ${profile.firstName} bursting through the page`}
     >
