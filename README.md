@@ -1,32 +1,38 @@
-# React + TypeScript + Vite
+# Ananthu Narashimman · Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+My personal site: a pixel-art portfolio for the AI agents, developer tools and full-stack products I build.
 
-Currently, two official plugins are available:
+**Live at [ananthu.xyz](https://www.ananthu.xyz)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+[![Ananthu Narashimman: shipping AI systems people actually use](public/og.jpg)](https://www.ananthu.xyz)
 
-## React Compiler
+## What's inside
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Pixel opening animation, then a hero with a torn-page portrait that follows the cursor
+- Projects with detailed case-study pages, plus my published npm packages
+- A tech stack marquee, a journey timeline and a hackathon diary with hand-drawn pixel city scenes
+- A "Now" section with live GitHub stats and a hoverable contribution heatmap
+- Contact and hackathon-invite forms that send email straight from the site
+- Light and dark themes, scroll reveals, and animations tuned to stay smooth on low-end laptops
 
-## Expanding the Oxlint configuration
+## Stack
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+React 19 · TypeScript · Vite · Tailwind CSS 4 · Motion · React Router · Vercel (hosting, functions, analytics) · Resend (email)
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Run it locally
+
+```sh
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+`npm run dev` serves the site only. The contact form posts to a Vercel Function in `api/contact.ts`, so to try it locally run `npx vercel dev` with a `RESEND_API_KEY` environment variable set.
+
+## Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Serve the production build |
+| `npm run lint` | Lint with Oxlint |
