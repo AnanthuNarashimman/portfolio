@@ -1,6 +1,7 @@
-import { useState, type CSSProperties, type FormEvent, type RefObject } from 'react'
-import { ArrowRight, X } from 'lucide-react'
-import type { MailValues } from '../lib/mail'
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent, type RefObject } from 'react'
+import { ArrowRight, Check, Loader2, X } from 'lucide-react'
+import { profile } from '../data/profile'
+import type { MailMeta, MailValues } from '../lib/mail'
 import './mail-dialog.css'
 
 /*
@@ -39,6 +40,8 @@ function Field({ field, value, onChange }: { field: MailField; value: string; on
   )
 }
 
+type Status = { state: 'idle' | 'sending' | 'sent' } | { state: 'error'; message: string }
+
 export default function MailDialog({
   dialogRef,
   id,
@@ -58,17 +61,47 @@ export default function MailDialog({
   fields: MailField[]
   initial?: MailValues
   submitLabel: string
-  onSend: (values: MailValues) => Promise<void>
+  onSend: (values: MailValues, meta: MailMeta) => Promise<void>
 }) {
-  const [form, setForm] = useState<MailValues>(() => ({ ...Object.fromEntries(fields.map((f) => [f.name, ''])), ...initial }))
-  const set = (name: string, value: string) => setForm((f) => ({ ...f, [name]: value }))
+  const blank = () => ({ ...Object.fromEntries(fields.map((f) => [f.name, ''])), ...initial })
+  const [form, setForm] = useState<MailValues>(blank)
+  const [status, setStatus] = useState<Status>({ state: 'idle' })
+  const [honeypot, setHoneypot] = useState('')
+  const startedAt = useRef<number | null>(null) // first keystroke: bots that submit instantly get quietly dropped
+  const set = (name: string, value: string) => {
+    startedAt.current ??= Date.now()
+    setForm((f) => ({ ...f, [name]: value }))
+  }
   const close = () => dialogRef.current?.close()
+
+  // After a successful send, closing the dialog clears it for the next message
+  useEffect(() => {
+    const d = dialogRef.current
+    if (!d) return
+    const onClose = () => {
+      if (status.state !== 'sent') return
+      setForm(blank())
+      setHoneypot('')
+      startedAt.current = null
+      setStatus({ state: 'idle' })
+    }
+    d.addEventListener('close', onClose)
+    return () => d.removeEventListener('close', onClose)
+  })
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
-    await onSend(form)
-    close()
+    if (status.state === 'sending') return
+    setStatus({ state: 'sending' })
+    try {
+      await onSend(form, { company: honeypot, elapsed: startedAt.current ? Date.now() - startedAt.current : 0 })
+      setStatus({ state: 'sent' })
+    } catch (err) {
+      setStatus({ state: 'error', message: err instanceof Error ? err.message : 'Something went wrong. Please try again.' })
+    }
   }
+
+  const sending = status.state === 'sending'
 
   return (
     <dialog
@@ -88,27 +121,79 @@ export default function MailDialog({
           >
             <X className="size-4" />
           </button>
-          <p className="font-mono text-xs tracking-[0.25em] text-accent-700 uppercase dark:text-accent-300">{eyebrow}</p>
-          <h3 id={`${id}-title`} className="mt-2 font-display text-2xl font-semibold tracking-[-0.02em] text-ink dark:text-accent-50">
-            {title}
-          </h3>
-          <p className="mt-2 text-[15px] leading-relaxed text-ink/70 dark:text-accent-100/75">{blurb}</p>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {fields.map((f) => (
-              <Field key={f.name} field={f} value={form[f.name] ?? ''} onChange={set} />
-            ))}
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <button type="submit" className="group relative inline-flex cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-300">
-              <span aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-1 translate-y-1 bg-accent-900/60" />
-              <span className="pixel-corners relative inline-flex items-center gap-2 bg-accent-300 px-5 py-2.5 text-sm font-bold text-accent-800 transition-[translate,background-color] duration-150 group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:bg-accent-200 group-active:translate-x-1 group-active:translate-y-1">
-                {submitLabel} <ArrowRight className="size-4" />
+          {status.state === 'sent' ? (
+            // Success: the form gives way to a short confirmation
+            <div className="mail-sent py-6 text-center" role="status">
+              <span aria-hidden="true" className="pixel-corners mx-auto grid size-14 place-items-center bg-accent-300 text-accent-800" style={px(4)}>
+                <Check className="size-7" strokeWidth={3} />
               </span>
-            </button>
-            <p className="font-mono text-[11px] text-ink/50 dark:text-accent-100/50">Opens your mail app, pre-filled.</p>
-          </div>
+              <h3 id={`${id}-title`} className="mt-5 font-display text-2xl font-semibold tracking-[-0.02em] text-ink dark:text-accent-50">
+                Sent. Thanks{form.name ? `, ${form.name.split(' ')[0]}` : ''}!
+              </h3>
+              <p className="mx-auto mt-2 max-w-sm text-[15px] leading-relaxed text-ink/70 dark:text-accent-100/75">
+                It’s in my inbox. I’ll reply to <span className="font-medium text-ink dark:text-accent-50">{form.email}</span> within a day.
+              </p>
+              <button
+                type="button"
+                onClick={close}
+                className="mt-6 cursor-pointer font-mono text-xs font-bold tracking-[0.16em] text-accent-700 uppercase hover:text-accent-800 dark:text-accent-300"
+              >
+                Close
+              </button>
+            </div>
+          ) : (
+            <>
+              <p className="font-mono text-xs tracking-[0.25em] text-accent-700 uppercase dark:text-accent-300">{eyebrow}</p>
+              <h3 id={`${id}-title`} className="mt-2 font-display text-2xl font-semibold tracking-[-0.02em] text-ink dark:text-accent-50">
+                {title}
+              </h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-ink/70 dark:text-accent-100/75">{blurb}</p>
+
+              <fieldset disabled={sending} className="mt-6 grid gap-4 disabled:opacity-70 sm:grid-cols-2">
+                {fields.map((f) => (
+                  <Field key={f.name} field={f} value={form[f.name] ?? ''} onChange={set} />
+                ))}
+              </fieldset>
+
+              {/* Honeypot: invisible to people, irresistible to form-filling bots */}
+              <label aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                Company
+                <input tabIndex={-1} autoComplete="off" name="company" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
+              </label>
+
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className="group relative inline-flex cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-300 disabled:cursor-wait"
+                >
+                  <span aria-hidden="true" className="pixel-corners absolute inset-0 translate-x-1 translate-y-1 bg-accent-900/60" />
+                  <span className="pixel-corners relative inline-flex items-center gap-2 bg-accent-300 px-5 py-2.5 text-sm font-bold text-accent-800 transition-[translate,background-color] duration-150 group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:bg-accent-200 group-active:translate-x-1 group-active:translate-y-1 group-disabled:translate-x-0 group-disabled:translate-y-0">
+                    {sending ? (
+                      <>
+                        Sending <Loader2 className="size-4 animate-spin" />
+                      </>
+                    ) : (
+                      <>
+                        {submitLabel} <ArrowRight className="size-4" />
+                      </>
+                    )}
+                  </span>
+                </button>
+                <p className="font-mono text-[11px] text-ink/50 dark:text-accent-100/50">Goes straight to my inbox.</p>
+              </div>
+
+              {status.state === 'error' && (
+                <p role="alert" className="mt-4 text-sm text-accent-700 dark:text-accent-300">
+                  {status.message}{' '}
+                  <a href={`mailto:${profile.email}`} className="underline underline-offset-2">
+                    Or email me directly.
+                  </a>
+                </p>
+              )}
+            </>
+          )}
         </form>
       </div>
     </dialog>
