@@ -1,7 +1,7 @@
 /*
  * Live GitHub activity for the "Now" section.
- * - Daily contribution counts for the last year: github-contributions-api.jogruber.de (scrapes the
- *   public profile graph, CORS-enabled, no token).
+ * - Daily contribution counts for the last year: our /api/contributions (reads GitHub's public
+ *   contributions graph), falling back to github-contributions-api.jogruber.de.
  * - What happened on each day (repos pushed to, PRs…): GitHub's public events API, which only
  *   reaches back ~90 days / 100 events, so older days show counts only.
  * Results are cached in sessionStorage for half an hour so navigating around doesn't refetch.
@@ -78,10 +78,17 @@ export async function fetchGitHubActivity(user: string, signal?: AbortSignal): P
   const cached = readCache()
   if (cached) return cached
 
-  const [contrib, events] = await Promise.all([
-    fetch(`https://github-contributions-api.jogruber.de/v4/${user}?y=last`, { signal }).then((r) => {
+  const contribFrom = (url: string) =>
+    fetch(url, { signal }).then((r) => {
       if (!r.ok) throw new Error(`contributions ${r.status}`)
       return r.json() as Promise<{ contributions: Day[] }>
+    })
+
+  const [contrib, events] = await Promise.all([
+    // Our own /api reads GitHub directly; the public scraper is the fallback (and covers plain `vite dev`)
+    contribFrom(`/api/contributions?user=${user}`).catch((e: unknown) => {
+      if (signal?.aborted) throw e
+      return contribFrom(`https://github-contributions-api.jogruber.de/v4/${user}?y=last`)
     }),
     // The events feed is a nice-to-have; the heatmap still works without it (e.g. rate-limited)
     fetch(`https://api.github.com/users/${user}/events/public?per_page=100`, { signal })
