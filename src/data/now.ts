@@ -1,6 +1,6 @@
 // The "Now" section's hand-written month log. Update this once a month; everything else on the
 // section (heatmap, month stats, most-pushed repo) comes live from GitHub.
-export type NowKind = 'shipping' | 'work' | 'contributing' | 'building' | 'learning'
+export type NowKind = 'shipping' | 'work' | 'contributing' | 'building' | 'learning' | 'interviewing'
 
 export type NowEntry = {
   kind: NowKind
@@ -10,30 +10,29 @@ export type NowEntry = {
 }
 
 export const now = {
-  month: 'September 2026',
-  updated: '2026-09-26',
+  month: 'October 2026',
+  updated: '2026-10-06',
   entries: [
     {
       kind: 'work',
       title: 'Founding team, stealth AI startup',
-      text: 'Second month in. Voice AI agents running in production, and the backend foundations underneath them.',
+      text: 'Third month in. Still shipping voice AI agents to production, and the backend that keeps them running.',
+    },
+    {
+      kind: 'interviewing',
+      title: 'Interviewing with startups',
+      text: 'Talking to multiple startups about the next step up in my career.',
     },
     {
       kind: 'shipping',
       title: 'shipstat',
-      text: 'Honest npm download stats, with cards worth sharing. Went from an empty repo to twenty pushes in a single day.',
+      text: 'Making it better: sharper stats, nicer cards, fewer rough edges.',
       href: 'https://github.com/AnanthuNarashimman/shipstat',
-    },
-    {
-      kind: 'contributing',
-      title: 'agent-orchestrator',
-      text: 'Opened pull requests to an open-source agent orchestrator.',
-      href: 'https://github.com/Untrivial-ai/agent-orchestrator',
     },
     {
       kind: 'building',
       title: 'This portfolio',
-      text: 'Pixel by pixel, including the section you’re reading.',
+      text: 'Still improving it, pixel by pixel.',
     },
   ] satisfies NowEntry[],
 }

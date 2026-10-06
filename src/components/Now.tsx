@@ -52,6 +52,7 @@ const GLYPHS = {
   contributing: ['.##.##.', '#######', '#######', '#######', '.#####.', '..###..', '...#...'], // heart
   building: ['.####..', '######.', '.####..', '...#...', '...#...', '...#...', '...#...'], // hammer
   learning: ['.......', '##...##', '###.###', '###.###', '###.###', '##.#.##', '.#...#.'], // book
+  interviewing: ['...####', '.....##', '....#.#', '...#..#', '..#....', '.#.....', '#......'], // arrow up and right
   calendar: ['.#...#.', '#######', '#.....#', '#.#.#.#', '#.....#', '#.#.#.#', '#######'],
   check: ['......#', '.....##', '#...##.', '##.##..', '.###...', '..#....', '.......'],
   flame: ['...#...', '..##...', '.####..', '.#####.', '##.###.', '##..##.', '.####..'],
@@ -75,6 +76,7 @@ const KIND: Record<NowKind, { label: string; tile: string; text: string }> = {
   contributing: { label: 'Open source', tile: 'bg-ink text-accent-300 dark:bg-accent-50 dark:text-accent-700', text: 'text-ink/70 dark:text-accent-100/70' },
   building: { label: 'Building', tile: 'bg-accent-400 text-ink', text: 'text-accent-500 dark:text-accent-400' },
   learning: { label: 'Learning', tile: 'bg-accent-200 text-accent-800', text: 'text-accent-800 dark:text-accent-200' },
+  interviewing: { label: 'Next step', tile: 'bg-accent-700 text-accent-100', text: 'text-accent-700 dark:text-accent-300' },
 }
 
 function Panel({
