@@ -11,12 +11,12 @@ export type NowEntry = {
 
 export const now = {
   month: 'October 2026',
-  updated: '2026-10-06',
+  updated: '2026-10-14',
   entries: [
     {
       kind: 'work',
-      title: 'Founding team, stealth AI startup',
-      text: 'Third month in. Still shipping voice AI agents to production, and the backend that keeps them running.',
+      title: 'Wrapping up at the stealth AI startup',
+      text: 'My time on the founding team ends this October, after three months of voice AI agents in production and the backend underneath them.',
     },
     {
       kind: 'interviewing',
